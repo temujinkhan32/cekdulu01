@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -11,27 +12,66 @@ app.use(cors());
 app.use(express.json());
 
 // ============================================================
-// HEALTH CHECK — buat verifikasi server jalan
+// SERVE FRONTEND (folder public/)
 // ============================================================
-app.get('/', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'CekDulu Backend berjalan!',
-    version: '1.0.0',
-    endpoints: [
-      'GET  /search?q=nama+produk',
-      'GET  /health',
-    ]
-  });
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
+// ============================================================
+// KEYWORD LOG — simpan pencarian untuk insight SEO
+// Maks 1000 entri terakhir (in-memory, cukup untuk monitoring)
+// ============================================================
+const keywordLog = [];
+const MAX_LOG = 1000;
+
+function logKeyword(query) {
+  keywordLog.unshift({
+    keyword: query,
+    timestamp: new Date().toISOString(),
+    date: new Date().toLocaleDateString('id-ID'),
+  });
+  if (keywordLog.length > MAX_LOG) keywordLog.splice(MAX_LOG);
+}
+
+// ============================================================
+// HEALTH CHECK
+// ============================================================
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // ============================================================
+// ADMIN — lihat keyword yang dicari orang
+// Akses: GET /admin/keywords?key=PASSWORD_KAMU
+// Set ADMIN_KEY di Railway Variables
+// ============================================================
+app.get('/admin/keywords', (req, res) => {
+  const adminKey = process.env.ADMIN_KEY || 'cekdulu-admin';
+  if (req.query.key !== adminKey) {
+    return res.status(401).json({ error: 'Unauthorized. Tambahkan ?key=PASSWORD_KAMU' });
+  }
+
+  // Hitung frekuensi keyword
+  const freq = {};
+  keywordLog.forEach(entry => {
+    const kw = entry.keyword.toLowerCase();
+    freq[kw] = (freq[kw] || 0) + 1;
+  });
+
+  const topKeywords = Object.entries(freq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 50)
+    .map(([keyword, count]) => ({ keyword, count }));
+
+  res.json({
+    total_searches: keywordLog.length,
+    top_keywords: topKeywords,
+    recent_searches: keywordLog.slice(0, 100),
+    note: 'Data ini reset saat server restart. Gunakan untuk inspirasi artikel SEO.',
+  });
+});
+
+// ============================================================
 // HELPER — generate affiliate link
-// Nanti kamu isi dengan affiliate ID asli kamu di file .env
 // ============================================================
 function buildAffiliateLink(marketplace, originalUrl) {
   const affiliateIds = {
@@ -41,8 +81,6 @@ function buildAffiliateLink(marketplace, originalUrl) {
     bukalapak: process.env.BUKALAPAK_AFFILIATE_ID || 'DEMO_BUKALAPAK',
   };
 
-  // Format affiliate link per marketplace
-  // Ini akan diupdate di Phase 2B saat kamu dapet affiliate API key resmi
   switch (marketplace) {
     case 'shopee':
       return `${originalUrl}?af_id=${affiliateIds.shopee}`;
@@ -58,7 +96,7 @@ function buildAffiliateLink(marketplace, originalUrl) {
 }
 
 // ============================================================
-// HELPER — scrape Tokopedia (workaround tanpa API resmi)
+// HELPER — scrape Tokopedia
 // ============================================================
 async function searchTokopedia(query) {
   try {
@@ -71,7 +109,6 @@ async function searchTokopedia(query) {
     const $ = cheerio.load(response.data);
 
     const results = [];
-    // Tokopedia renders via React — kita ambil dari script tag JSON
     $('script[type="application/ld+json"]').each((i, el) => {
       try {
         const data = JSON.parse($(el).html());
@@ -93,7 +130,6 @@ async function searchTokopedia(query) {
       } catch (e) {}
     });
 
-    // Fallback: return placeholder jika scraping tidak berhasil
     if (results.length === 0) {
       results.push({
         name: `${query} - Tokopedia`,
@@ -101,13 +137,10 @@ async function searchTokopedia(query) {
         priceNum: 0,
         marketplace: 'tokopedia',
         url: buildAffiliateLink('tokopedia', `https://www.tokopedia.com/search?q=${encodeURIComponent(query)}`),
-        rating: '-',
-        reviews: '-',
-        image: null,
+        rating: '-', reviews: '-', image: null,
         note: 'Klik untuk lihat harga terbaru',
       });
     }
-
     return results;
   } catch (error) {
     console.error('Tokopedia search error:', error.message);
@@ -117,9 +150,7 @@ async function searchTokopedia(query) {
       priceNum: 0,
       marketplace: 'tokopedia',
       url: buildAffiliateLink('tokopedia', `https://www.tokopedia.com/search?q=${encodeURIComponent(query)}`),
-      rating: '-',
-      reviews: '-',
-      image: null,
+      rating: '-', reviews: '-', image: null,
       note: 'Klik untuk lihat harga terbaru',
     }];
   }
@@ -165,13 +196,10 @@ async function searchBukalapak(query) {
         priceNum: 0,
         marketplace: 'bukalapak',
         url: buildAffiliateLink('bukalapak', `https://www.bukalapak.com/products?search[keywords]=${encodeURIComponent(query)}`),
-        rating: '-',
-        reviews: '-',
-        image: null,
+        rating: '-', reviews: '-', image: null,
         note: 'Klik untuk lihat harga terbaru',
       });
     }
-
     return results;
   } catch (error) {
     console.error('Bukalapak search error:', error.message);
@@ -181,9 +209,7 @@ async function searchBukalapak(query) {
       priceNum: 0,
       marketplace: 'bukalapak',
       url: buildAffiliateLink('bukalapak', `https://www.bukalapak.com/products?search[keywords]=${encodeURIComponent(query)}`),
-      rating: '-',
-      reviews: '-',
-      image: null,
+      rating: '-', reviews: '-', image: null,
       note: 'Klik untuk lihat harga terbaru',
     }];
   }
@@ -203,30 +229,26 @@ app.get('/search', async (req, res) => {
     });
   }
 
-  console.log(`[CekDulu] Searching: "${query}"`);
+  // 🔑 Log keyword untuk insight SEO
+  logKeyword(query.trim());
+  console.log(`[CekDulu] Search: "${query}" | Total log: ${keywordLog.length}`);
 
   try {
-    // Jalankan semua scraping secara paralel (lebih cepat)
     const [tokopediaResults, bukalapakResults] = await Promise.all([
       searchTokopedia(query),
       searchBukalapak(query),
     ]);
 
-    // Gabungkan semua hasil
     const allResults = [
       ...tokopediaResults,
       ...bukalapakResults,
-      // Shopee & Lazada: link langsung ke search page dengan affiliate
-      // (akan di-upgrade ke API resmi saat affiliate account aktif)
       {
         name: `${query} - Shopee`,
         price: 'Cek di Shopee',
         priceNum: 0,
         marketplace: 'shopee',
         url: buildAffiliateLink('shopee', `https://shopee.co.id/search?keyword=${encodeURIComponent(query)}`),
-        rating: '-',
-        reviews: '-',
-        image: null,
+        rating: '-', reviews: '-', image: null,
         note: 'Klik untuk lihat harga terbaru',
       },
       {
@@ -235,14 +257,11 @@ app.get('/search', async (req, res) => {
         priceNum: 0,
         marketplace: 'lazada',
         url: buildAffiliateLink('lazada', `https://www.lazada.co.id/catalog/?q=${encodeURIComponent(query)}`),
-        rating: '-',
-        reviews: '-',
-        image: null,
+        rating: '-', reviews: '-', image: null,
         note: 'Klik untuk lihat harga terbaru',
       },
     ];
 
-    // Sort: yang ada harga dulu, yang belum ada harga di bawah
     allResults.sort((a, b) => {
       if (a.priceNum > 0 && b.priceNum === 0) return -1;
       if (a.priceNum === 0 && b.priceNum > 0) return 1;
@@ -272,7 +291,7 @@ app.get('/search', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════╗
-║   CekDulu Backend v1.0.0             ║
+║   CekDulu Backend v1.1.0             ║
 ║   Server berjalan di port ${PORT}        ║
 ║   http://localhost:${PORT}               ║
 ╚══════════════════════════════════════╝
