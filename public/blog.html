@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog & Tips Belanja – CekDulu</title>
+  <meta name="description" content="Tips belanja cerdas, rekomendasi produk terbaik, dan cara mendapatkan harga termurah di marketplace Indonesia." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --accent:  #E8460A;
+      --accent2: #1D9E75;
+      --bg:      #F5F3EE;
+      --card:    #fff;
+      --text:    #1a1a18;
+      --muted:   #6B6A65;
+      --border:  rgba(0,0,0,0.12);
+      --line:    #D3D1C7;
+      --radius:  14px;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .app { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+
+    /* ── NAV ── */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2.5rem; }
+    .logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent); text-decoration: none; }
+    .logo sup { font-size: 10px; font-weight: 500; color: var(--muted); margin-left: 2px; vertical-align: super; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--text); }
+    .nav-badge { background: #FAECE7; color: #D85A30; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 700; border: 1px solid #F5C4B3; }
+
+    /* ── HERO ── */
+    .blog-hero { padding: 2.5rem 0 2rem; }
+    .blog-hero .eyebrow { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 1rem; }
+    .blog-hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; letter-spacing: -1px; line-height: 1.15; margin-bottom: .65rem; }
+    .blog-hero h1 em { color: var(--accent); font-style: normal; }
+    .blog-hero p { font-size: 14px; color: var(--muted); max-width: 480px; line-height: 1.7; margin-bottom: 1.5rem; }
+
+    /* ── SEARCH BAR ── */
+    .search-wrap { max-width: 540px; }
+    .search-bar { display: flex; align-items: center; background: var(--card); border: 2px solid var(--line); border-radius: 50px; padding: 6px 6px 6px 20px; gap: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.08); transition: border-color .2s; }
+    .search-bar:focus-within { border-color: var(--accent); }
+    .search-bar input { flex: 1; border: none; outline: none; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif; background: transparent; color: var(--text); }
+    .search-bar input::placeholder { color: #B4B2A9; }
+    .search-btn { background: var(--accent); color: #fff; border: none; border-radius: 50px; padding: 10px 22px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
+    .search-btn:hover { opacity: .88; }
+
+    /* ── CATEGORY FILTERS ── */
+    .cat-filters { display: flex; gap: 8px; margin: 2rem 0 1.75rem; flex-wrap: wrap; }
+    .cat-btn { border: 1.5px solid var(--line); border-radius: 50px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; background: #E8E6DF; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s; }
+    .cat-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+    .cat-btn:hover:not(.active) { background: var(--line); }
+
+    /* ── FEATURED ARTICLE ── */
+    .featured { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; display: grid; grid-template-columns: 1fr 160px; gap: 1.5rem; align-items: center; cursor: pointer; transition: all .2s; }
+    .featured:hover { border-color: #888780; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.09); }
+    .featured-tag { font-size: 11px; font-weight: 700; background: #FAECE7; color: #D85A30; border: 1px solid #F5C4B3; padding: 3px 9px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
+    .featured h2 { font-size: 20px; font-weight: 700; letter-spacing: -.4px; line-height: 1.3; margin-bottom: 8px; }
+    .featured p { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 12px; }
+    .featured-meta { font-size: 12px; color: var(--muted); font-weight: 500; display: flex; gap: 12px; flex-wrap: wrap; }
+    .featured-thumb { width: 160px; height: 120px; background: #F1EFE8; border: 1px solid #E8E6DF; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 52px; flex-shrink: 0; }
+
+    /* ── BLOG GRID ── */
+    .section-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 1.25rem; }
+    .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+
+    .blog-card { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: all .2s; cursor: pointer; display: flex; flex-direction: column; }
+    .blog-card:hover { border-color: #888780; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.09); }
+
+    .blog-thumb { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 48px; border-bottom: 1px solid #E8E6DF; }
+    .thumb-orange { background: #FEF3EC; }
+    .thumb-green  { background: #EDFBF5; }
+    .thumb-blue   { background: #EBF4FD; }
+    .thumb-yellow { background: #FEFBEC; }
+    .thumb-red    { background: #FDF0EE; }
+    .thumb-gray   { background: #F1EFE8; }
+
+    .blog-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+
+    .blog-cat { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .3px; }
+    .cat-tips    { background: #FAECE7; color: #D85A30; border: 1px solid #F5C4B3; }
+    .cat-review  { background: #E0F7EE; color: #0F6E56; border: 1px solid #9FE1CB; }
+    .cat-panduan { background: #E6F1FB; color: #0C447C; border: 1px solid #B5D4F4; }
+    .cat-promo   { background: #FEF9E7; color: #7A5A00; border: 1px solid #FAC775; }
+
+    .blog-title { font-size: 14px; font-weight: 700; line-height: 1.4; margin-bottom: 6px; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+    .blog-excerpt { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .blog-meta { font-size: 11px; color: var(--muted); font-weight: 500; display: flex; gap: 10px; flex-wrap: wrap; margin-top: auto; }
+
+    /* ── CTA BANNER ── */
+    .cta-banner { background: linear-gradient(135deg, #04342C, #0F6E56); border-radius: var(--radius); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.5rem 0; }
+    .cta-left h3 { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .cta-left p { font-size: 13px; color: rgba(255,255,255,.75); line-height: 1.6; max-width: 400px; }
+    .cta-btn { background: #fff; color: #04342C; border: none; border-radius: 50px; padding: 11px 24px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: opacity .2s; text-decoration: none; display: inline-block; }
+    .cta-btn:hover { opacity: .88; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); margin-top: 1rem; padding: 1.5rem 0 2rem; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .footer-brand p { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 220px; line-height: 1.6; }
+    .footer-links-grid { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .footer-col h4 { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 10px; }
+    .footer-col a { display: block; font-size: 12px; color: var(--muted); text-decoration: none; margin-bottom: 6px; font-weight: 500; transition: color .15s; }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .footer-bottom p { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .footer-mkt { display: flex; gap: 6px; flex-wrap: wrap; }
+    .footer-mkt span { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+    .shop-shopee    { background: #F5C4B3; color: #993C1D; }
+    .shop-tokopedia { background: #9FE1CB; color: #085041; }
+    .shop-lazada    { background: #B5D4F4; color: #0C447C; }
+    .shop-bukalapak { background: #F7C1C1; color: #791F1F; }
+
+    @media (max-width: 600px) {
+      .featured { grid-template-columns: 1fr; }
+      .featured-thumb { width: 100%; height: 100px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="logo">CekDulu<sup>beta</sup></a>
+    <div class="nav-links">
+      <a href="/">🔍 Bandingkan harga</a>
+      <a href="/blog.html" class="active">📝 Blog</a>
+      <span class="nav-badge">Indonesia 🇮🇩</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="blog-hero">
+    <p class="eyebrow">Blog & Tips Belanja</p>
+    <h1>Beli <em>Lebih Cerdas,</em><br>Hemat Lebih Banyak</h1>
+    <p>Panduan belanja, perbandingan produk, dan cara dapat harga terbaik di marketplace Indonesia.</p>
+    <div class="search-wrap">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Mau beli apa? Cek harganya sekarang..." />
+        <button class="search-btn" onclick="goSearch()">Cek Harga</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY FILTERS -->
+  <div class="cat-filters">
+    <button class="cat-btn active">Semua</button>
+    <button class="cat-btn">Tips Belanja</button>
+    <button class="cat-btn">Review Produk</button>
+    <button class="cat-btn">Panduan</button>
+    <button class="cat-btn">Promo & Diskon</button>
+  </div>
+
+  <!-- FEATURED ARTICLE -->
+  <div class="featured">
+    <div>
+      <span class="featured-tag">✦ Artikel pilihan</span>
+      <h2>5 Cara Dapat Harga Termurah di Marketplace Indonesia</h2>
+      <p>Belanja online bisa jauh lebih hemat kalau kamu tahu triknya. Mulai dari timing yang tepat, memanfaatkan cashback, hingga membandingkan harga antar marketplace.</p>
+      <div class="featured-meta">
+        <span>📅 Maret 2026</span>
+        <span>⏱ 4 menit baca</span>
+        <span>Tips Belanja</span>
+      </div>
+    </div>
+    <div class="featured-thumb">💡</div>
+  </div>
+
+  <!-- ARTICLES -->
+  <p class="section-label">Artikel terbaru</p>
+  <div class="blog-grid">
+
+    <div class="blog-card">
+      <div class="blog-thumb thumb-orange">🎧</div>
+      <div class="blog-body">
+        <span class="blog-cat cat-review">Review</span>
+        <p class="blog-title">Sony WH-1000XM5 vs XM4: Mana yang Worth It di 2026?</p>
+        <p class="blog-excerpt">Perbandingan lengkap dua headphone premium Sony. Perbedaan harga, kualitas audio, dan fitur noise-cancelling yang perlu kamu tahu sebelum beli.</p>
+        <div class="blog-meta"><span>📅 Mar 2026</span><span>⏱ 6 mnt</span></div>
+      </div>
+    </div>
+
+    <div class="blog-card">
+      <div class="blog-thumb thumb-green">🛒</div>
+      <div class="blog-body">
+        <span class="blog-cat cat-panduan">Panduan</span>
+        <p class="blog-title">Tokopedia vs Shopee vs Lazada: Mana yang Paling Murah?</p>
+        <p class="blog-excerpt">Perbandingan jujur tiga marketplace terbesar Indonesia — harga, ongkos kirim, dan promo rutin di masing-masing platform.</p>
+        <div class="blog-meta"><span>📅 Mar 2026</span><span>⏱ 5 mnt</span></div>
+      </div>
+    </div>
+
+    <div class="blog-card">
+      <div class="blog-thumb thumb-blue">📱</div>
+      <div class="blog-body">
+        <span class="blog-cat cat-review">Review</span>
+        <p class="blog-title">HP Terbaik di Bawah 3 Juta: Rekomendasi 2026</p>
+        <p class="blog-excerpt">Budget terbatas bukan halangan dapat HP bagus. 7 smartphone terbaik dengan harga di bawah 3 juta yang layak dibeli tahun ini.</p>
+        <div class="blog-meta"><span>📅 Mar 2026</span><span>⏱ 7 mnt</span></div>
+      </div>
+    </div>
+
+    <div class="blog-card">
+      <div class="blog-thumb thumb-yellow">🎮</div>
+      <div class="blog-body">
+        <span class="blog-cat cat-promo">Promo</span>
+        <p class="blog-title">Kapan Waktu Terbaik Beli Laptop Gaming?</p>
+        <p class="blog-excerpt">Harbolnas, 11.11, 12.12, atau pas biasa? Kami lacak histori harga laptop gaming selama setahun untuk cari waktu paling murah.</p>
+        <div class="blog-meta"><span>📅 Feb 2026</span><span>⏱ 5 mnt</span></div>
+      </div>
+    </div>
+
+    <div class="blog-card">
+      <div class="blog-thumb thumb-red">🏠</div>
+      <div class="blog-body">
+        <span class="blog-cat cat-tips">Tips</span>
+        <p class="blog-title">10 Produk Rumah Tangga yang Beda Harga Jauh Antar Marketplace</p>
+        <p class="blog-excerpt">Harga peralatan rumah tangga bisa beda 30–40% antara satu marketplace dan lainnya. Cek daftar lengkapnya di sini.</p>
+        <div class="blog-meta"><span>📅 Feb 2026</span><span>⏱ 4 mnt</span></div>
+      </div>
+    </div>
+
+    <div class="blog-card">
+      <div class="blog-thumb thumb-gray">⌚</div>
+      <div class="blog-body">
+        <span class="blog-cat cat-review">Review</span>
+        <p class="blog-title">Samsung Galaxy Watch 6 vs Apple Watch SE: Mana untuk Kamu?</p>
+        <p class="blog-excerpt">Dua smartwatch populer di harga yang berdekatan — kami bandingkan fitur, akurasi sensor, dan daya tahan baterai secara head-to-head.</p>
+        <div class="blog-meta"><span>📅 Feb 2026</span><span>⏱ 6 mnt</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner">
+    <div class="cta-left">
+      <h3>Siap beli? Cek harga dulu!</h3>
+      <p>Sebelum checkout, pastikan kamu sudah bandingkan harga di semua marketplace. Bisa hemat ratusan ribu rupiah per pembelian.</p>
+    </div>
+    <a href="/" class="cta-btn">Bandingkan Harga →</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="/" class="logo">CekDulu<sup>beta</sup></a>
+        <p>Platform perbandingan harga produk marketplace Indonesia. Gratis dan transparan.</p>
+      </div>
+      <div class="footer-links-grid">
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a href="/">Bandingkan harga</a>
+          <a href="/blog.html">Blog</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="#">Kebijakan privasi</a>
+          <a href="#">Syarat & ketentuan</a>
+          <a href="#">Disclosure afiliasi</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 CekDulu. Dibuat dengan ❤️ untuk konsumen Indonesia.</p>
+      <div class="footer-mkt">
+        <span class="shop-shopee">Shopee</span>
+        <span class="shop-tokopedia">Tokopedia</span>
+        <span class="shop-lazada">Lazada</span>
+        <span class="shop-bukalapak">Bukalapak</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  document.getElementById('searchInput').addEventListener('keypress', e => {
+    if (e.key === 'Enter') goSearch();
+  });
+  function goSearch() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (q) window.location.href = '/?q=' + encodeURIComponent(q);
+  }
+
+  // Category filter buttons (UI only for now)
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
