@@ -5,6 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CekDulu – Bandingkan Harga di Semua Marketplace Indonesia</title>
   <meta name="description" content="Cari produk sekali, bandingkan harga dari Tokopedia, Shopee, Lazada, dan Bukalapak sekaligus. Gratis dan transparan." />
+
+  <!-- Schema Markup: WebSite + SearchAction (Google Sitelinks Searchbox) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "CekDulu",
+    "description": "Platform perbandingan harga marketplace Indonesia — Tokopedia, Shopee, Lazada, Bukalapak.",
+    "url": "https://cekdulu.id",
+    "inLanguage": "id-ID",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://cekdulu.id/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "CekDulu",
+      "url": "https://cekdulu.id",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cekdulu.id/logo.png"
+      }
+    }
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>

@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title id="pageTitle">Artikel – CekDulu</title>
   <meta name="description" id="pageDesc" content="Tips belanja cerdas dan perbandingan produk dari CekDulu." />
+
+  <!-- Schema Markup: BlogPosting — diisi dinamis saat artikel dimuat -->
+  <script type="application/ld+json" id="articleSchema">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Artikel – CekDulu",
+    "publisher": {
+      "@type": "Organization",
+      "name": "CekDulu",
+      "url": "https://cekdulu.id",
+      "logo": { "@type": "ImageObject", "url": "https://cekdulu.id/logo.png" }
+    },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://cekdulu.id/blog.html" }
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
@@ -467,14 +484,41 @@
     document.getElementById('pageDesc').setAttribute('content', a.title + '. Tips belanja cerdas dari CekDulu.');
     document.getElementById('breadcrumbTitle').textContent = a.title.length > 40 ? a.title.slice(0, 40) + '…' : a.title;
     document.getElementById('articleTitle').textContent = a.title;
-    document.getElementById('articleCat').textContent = a.cat;
-    document.getElementById('articleCat').className = 'article-cat ' + a.catClass;
-    document.getElementById('articleDate').textContent = a.date;
-    document.getElementById('articleReadTime').textContent = a.readTime;
+    document.getElementById('articleCat').textContent = a.cat || a.category;
+    document.getElementById('articleCat').className = 'article-cat ' + (a.catClass || a.cat_class || 'cat-tips');
+    document.getElementById('articleDate').textContent = a.date || a.date_str;
+    document.getElementById('articleReadTime').textContent = a.readTime || a.read_time;
     document.getElementById('articleThumb').textContent = a.thumb;
     document.getElementById('articleBody').innerHTML = a.body;
-    document.getElementById('articleTags').innerHTML =
-      (a.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+    const tagList = Array.isArray(a.tags) ? a.tags : (a.tags ? a.tags.split(',').map(t=>t.trim()) : []);
+    document.getElementById('articleTags').innerHTML = tagList.map(t => `<span class="tag">${t}</span>`).join('');
+
+    // — Update BlogPosting schema dinamis —
+    const slug = new URLSearchParams(window.location.search).get('slug') || '';
+    const pageUrl = `https://cekdulu.id/article.html?slug=${slug}`;
+    const datePublished = a.created_at ? a.created_at.split('T')[0] : (a.date || a.date_str || '');
+    const dateModified  = a.updated_at ? a.updated_at.split('T')[0] : datePublished;
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": a.title,
+      "description": a.title + '. Tips belanja cerdas dari CekDulu.',
+      "url": pageUrl,
+      "mainEntityOfPage": { "@type": "WebPage", "@id": pageUrl },
+      "datePublished": datePublished,
+      "dateModified": dateModified,
+      "author": { "@type": "Organization", "name": "CekDulu" },
+      "publisher": {
+        "@type": "Organization",
+        "name": "CekDulu",
+        "url": "https://cekdulu.id",
+        "logo": { "@type": "ImageObject", "url": "https://cekdulu.id/logo.png" }
+      },
+      "keywords": tagList.join(', '),
+      "articleSection": a.category || a.cat || 'Tips',
+      "inLanguage": "id-ID"
+    };
+    document.getElementById('articleSchema').textContent = JSON.stringify(schema, null, 2);
   }
 
   // Load artikel terkait dari API
