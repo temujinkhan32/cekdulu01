@@ -343,6 +343,69 @@ app.get('/search', async (req, res) => {
 });
 
 // ============================================================
+// SEO — robots.txt & sitemap.xml
+// Set SITE_URL in Railway Variables, e.g. https://cekdulu.id
+// ============================================================
+app.get('/robots.txt', (req, res) => {
+  const baseUrl = (process.env.SITE_URL || 'https://cekdulu.up.railway.app').replace(/\/$/, '');
+  res.setHeader('Content-Type', 'text/plain');
+  res.send(
+    `User-agent: *\n` +
+    `Allow: /\n` +
+    `Disallow: /admin\n` +
+    `Disallow: /admin/\n` +
+    `Disallow: /search\n\n` +
+    `Sitemap: ${baseUrl}/sitemap.xml\n`
+  );
+});
+
+app.get('/sitemap.xml', async (req, res) => {
+  const baseUrl = (process.env.SITE_URL || 'https://cekdulu.up.railway.app').replace(/\/$/, '');
+  const today = new Date().toISOString().split('T')[0];
+
+  // Static pages
+  const staticPages = [
+    { loc: `${baseUrl}/`,          priority: '1.0', changefreq: 'daily'   },
+    { loc: `${baseUrl}/blog.html`, priority: '0.9', changefreq: 'daily'   },
+  ];
+
+  // Dynamic posts from DB
+  let dynamicPages = [];
+  if (process.env.DATABASE_URL) {
+    try {
+      const { rows } = await pool.query(
+        `SELECT slug, updated_at FROM posts WHERE published = true ORDER BY created_at DESC`
+      );
+      dynamicPages = rows.map(p => ({
+        loc:        `${baseUrl}/article.html?slug=${p.slug}`,
+        lastmod:    p.updated_at ? p.updated_at.toISOString().split('T')[0] : today,
+        priority:   '0.8',
+        changefreq: 'weekly',
+      }));
+    } catch (err) {
+      console.error('[CekDulu] Sitemap DB error:', err.message);
+    }
+  }
+
+  const allPages = [...staticPages, ...dynamicPages];
+
+  const urlEntries = allPages.map(p => `
+  <url>
+    <loc>${p.loc}</loc>
+    ${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : `<lastmod>${today}</lastmod>`}
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('');
+
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.send(
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urlEntries + `\n</urlset>`
+  );
+});
+
+// ============================================================
 // START
 // ============================================================
 app.listen(PORT, () => {
