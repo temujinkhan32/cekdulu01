@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin – CekDulu CMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --accent: #E8460A; --accent2: #1D9E75;
+      --bg: #F5F3EE; --card: #fff; --text: #1a1a18; --muted: #6B6A65;
+      --border: rgba(0,0,0,0.12); --line: #D3D1C7; --radius: 14px;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── LOGIN ── */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .login-box { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 2rem; width: 100%; max-width: 380px; text-align: center; }
+    .login-box .logo { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: .25rem; }
+    .login-box .logo sup { font-size: 10px; color: var(--muted); }
+    .login-box p { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+    .login-box input { width: 100%; padding: 11px 16px; border: 1.5px solid var(--line); border-radius: 50px; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif; outline: none; margin-bottom: .75rem; text-align: center; letter-spacing: 2px; }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-box button { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 50px; padding: 11px; font-size: 14px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; }
+    .login-box button:hover { opacity: .88; }
+    .login-error { font-size: 12px; color: var(--accent); margin-top: .5rem; }
+
+    /* ── LAYOUT ── */
+    .app { display: none; }
+    .app.show { display: block; }
+    .topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .topbar .logo { font-size: 18px; font-weight: 700; color: var(--accent); text-decoration: none; }
+    .topbar .logo sup { font-size: 9px; color: var(--muted); }
+    .topbar-right { display: flex; align-items: center; gap: 1rem; }
+    .topbar-right a { font-size: 12px; color: var(--muted); text-decoration: none; font-weight: 600; }
+    .topbar-right a:hover { color: var(--text); }
+    .logout-btn { background: #E8E6DF; border: 1.5px solid var(--line); border-radius: 50px; padding: 5px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text); }
+
+    .main { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+
+    /* ── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── DASHBOARD ── */
+    .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .dash-title { font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+    .btn-new { background: var(--accent); color: #fff; border: none; border-radius: 50px; padding: 9px 20px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: opacity .2s; }
+    .btn-new:hover { opacity: .88; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 1rem 1.25rem; }
+    .stat-card .num { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -.5px; }
+    .stat-card .lbl { font-size: 12px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+
+    /* Posts table */
+    .posts-table { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .posts-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .posts-table th { padding: 10px 14px; font-weight: 700; background: #E8E6DF; color: var(--muted); text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+    .posts-table td { padding: 10px 14px; border-top: 1px solid #E8E6DF; vertical-align: middle; }
+    .posts-table tr:hover td { background: var(--bg); }
+    .pub-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+    .pub-yes { background: #C0DD97; color: #27500A; }
+    .pub-no  { background: #E8E6DF; color: #6B6A65; }
+    .row-actions { display: flex; gap: 6px; }
+    .btn-edit   { background: #E6F1FB; color: #0C447C; border: 1.5px solid #B5D4F4; border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .btn-toggle { background: #E8E6DF; color: var(--text); border: 1.5px solid var(--line); border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .btn-delete { background: #FEF3EC; color: var(--accent); border: 1.5px solid #F5C4B3; border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* ── EDITOR ── */
+    .editor-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .back-btn { background: #E8E6DF; border: 1.5px solid var(--line); border-radius: 50px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .editor-title { font-size: 18px; font-weight: 700; letter-spacing: -.3px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .field input, .field select, .field textarea {
+      padding: 9px 14px; border: 1.5px solid var(--line); border-radius: 10px;
+      font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif; outline: none;
+      background: var(--card); color: var(--text); transition: border-color .2s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+    .field textarea { resize: vertical; min-height: 80px; }
+
+    .body-field { margin-bottom: 1rem; }
+    .body-field label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 5px; }
+    .body-field textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 10px; font-size: 13px; font-family: monospace; outline: none; background: var(--card); color: var(--text); resize: vertical; min-height: 320px; line-height: 1.6; }
+    .body-field textarea:focus { border-color: var(--accent); }
+    .body-hint { font-size: 11px; color: var(--muted); margin-top: 5px; line-height: 1.6; }
+
+    .editor-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.25rem; }
+    .btn-save { background: var(--accent2); color: #fff; border: none; border-radius: 50px; padding: 10px 24px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; }
+    .btn-draft { background: #E8E6DF; color: var(--text); border: 1.5px solid var(--line); border-radius: 50px; padding: 10px 24px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; }
+    .btn-preview { background: #E6F1FB; color: #0C447C; border: 1.5px solid #B5D4F4; border-radius: 50px; padding: 10px 24px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+    .toast.show { opacity: 1; }
+
+    /* Empty state */
+    .empty { text-align: center; padding: 3rem; color: var(--muted); }
+    .empty .icon { font-size: 40px; margin-bottom: .75rem; }
+    .empty p { font-size: 14px; font-weight: 500; }
+
+    /* Keywords section */
+    .kw-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: .75rem; }
+    .kw-pill { background: #E8E6DF; border: 1px solid var(--line); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .kw-pill:hover { background: var(--line); }
+    .kw-count { font-size: 10px; background: var(--accent); color: #fff; border-radius: 10px; padding: 1px 6px; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="logo">CekDulu<sup>admin</sup></div>
+    <p>Masukkan Admin Key untuk lanjut</p>
+    <input type="password" id="keyInput" placeholder="Admin Key" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button onclick="doLogin()">Masuk →</button>
+    <p class="login-error" id="loginError"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appWrap">
+  <div class="topbar">
+    <a href="/" class="logo">CekDulu<sup>admin</sup></a>
+    <div class="topbar-right">
+      <a href="/" target="_blank">← Lihat website</a>
+      <a href="/blog.html" target="_blank">Blog</a>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view active" id="dashView">
+      <div class="dash-header">
+        <p class="dash-title">Dashboard</p>
+        <button class="btn-new" onclick="openEditor()">+ Artikel baru</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card"><p class="num" id="statTotal">—</p><p class="lbl">Total artikel</p></div>
+        <div class="stat-card"><p class="num" id="statPub">—</p><p class="lbl">Published</p></div>
+        <div class="stat-card"><p class="num" id="statDraft">—</p><p class="lbl">Draft</p></div>
+        <div class="stat-card"><p class="num" id="statSearch">—</p><p class="lbl">Total pencarian</p></div>
+      </div>
+
+      <!-- Hot keywords -->
+      <div style="background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem">
+        <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:.5rem">🔥 Keyword trending — klik untuk bikin artikel</p>
+        <div class="kw-grid" id="kwGrid"><p style="font-size:13px;color:var(--muted)">Belum ada data pencarian.</p></div>
+      </div>
+
+      <!-- Posts list -->
+      <div class="posts-table">
+        <table>
+          <thead><tr><th>Judul</th><th>Kategori</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody id="postsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EDITOR VIEW -->
+    <div class="view" id="editorView">
+      <div class="editor-header">
+        <button class="back-btn" onclick="showDash()">← Kembali</button>
+        <p class="editor-title" id="editorTitle">Artikel baru</p>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Judul artikel *</label>
+          <input type="text" id="fTitle" placeholder="contoh: 5 HP Terbaik 2026" />
+        </div>
+        <div class="field">
+          <label>Slug (URL) *</label>
+          <input type="text" id="fSlug" placeholder="contoh: hp-terbaik-2026" />
+        </div>
+        <div class="field">
+          <label>Kategori</label>
+          <select id="fCat" onchange="syncCatClass()">
+            <option value="Tips">Tips Belanja</option>
+            <option value="Review">Review Produk</option>
+            <option value="Panduan">Panduan</option>
+            <option value="Promo">Promo & Diskon</option>
+          </select>
+        </div>
+        <input type="hidden" id="fCatClass" value="cat-tips" />
+        <div class="field">
+          <label>Thumbnail emoji</label>
+          <input type="text" id="fThumb" placeholder="contoh: 📱" maxlength="4" />
+        </div>
+        <div class="field">
+          <label>Tanggal tampil</label>
+          <input type="text" id="fDate" placeholder="contoh: Maret 2026" />
+        </div>
+        <div class="field">
+          <label>Estimasi baca</label>
+          <input type="text" id="fReadTime" placeholder="contoh: 5 menit baca" />
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:1rem">
+        <label>Tags (pisahkan dengan koma)</label>
+        <input type="text" id="fTags" placeholder="contoh: Tips Belanja, Marketplace, Hemat" />
+      </div>
+
+      <div class="body-field">
+        <label>Isi artikel (HTML) *</label>
+        <textarea id="fBody" placeholder="Tulis isi artikel di sini dalam format HTML...&#10;&#10;Contoh:&#10;&lt;p&gt;Paragraf pertama...&lt;/p&gt;&#10;&lt;h2&gt;Subjudul&lt;/h2&gt;&#10;&lt;p&gt;Isi...&lt;/p&gt;"></textarea>
+        <p class="body-hint">
+          Gunakan HTML sederhana: &lt;p&gt; paragraf · &lt;h2&gt; subjudul · &lt;ul&gt;&lt;li&gt; list · &lt;strong&gt; bold<br>
+          Untuk kotak tips: <code>&lt;div class="tip-box"&gt;&lt;p class="tip-label"&gt;💡 Tip&lt;/p&gt;&lt;p&gt;isi&lt;/p&gt;&lt;/div&gt;</code><br>
+          Untuk CTA: <code>&lt;div class="inline-cta"&gt;&lt;div&gt;&lt;p&gt;teks&lt;/p&gt;&lt;/div&gt;&lt;a href="/" class="cta-btn"&gt;Cek Harga →&lt;/a&gt;&lt;/div&gt;</code>
+        </p>
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn-save"  onclick="savePost(true)">✓ Publish</button>
+        <button class="btn-draft" onclick="savePost(false)">Simpan draft</button>
+        <button class="btn-preview" onclick="previewPost()">👁 Preview</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = '';
+  let adminKey = '';
+  let editingSlug = null;
+  let allPosts = [];
+
+  // ── Auth ──────────────────────────────────────────────
+  async function doLogin() {
+    const key = document.getElementById('keyInput').value.trim();
+    if (!key) return;
+    try {
+      const res = await fetch(`${API}/admin/posts?key=${encodeURIComponent(key)}`);
+      if (res.status === 401) { document.getElementById('loginError').textContent = 'Key salah. Coba lagi.'; return; }
+      adminKey = key;
+      sessionStorage.setItem('adminKey', key);
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('appWrap').classList.add('show');
+      loadDashboard();
+    } catch(e) {
+      document.getElementById('loginError').textContent = 'Gagal terhubung ke server.';
+    }
+  }
+
+  function doLogout() {
+    adminKey = '';
+    sessionStorage.removeItem('adminKey');
+    location.reload();
+  }
+
+  // Auto-login if key in session
+  window.onload = () => {
+    const saved = sessionStorage.getItem('adminKey');
+    if (saved) { document.getElementById('keyInput').value = saved; doLogin(); }
+  };
+
+  // ── Dashboard ─────────────────────────────────────────
+  async function loadDashboard() {
+    await Promise.all([loadPosts(), loadKeywords()]);
+  }
+
+  async function loadPosts() {
+    try {
+      const res = await fetch(`${API}/admin/posts?key=${encodeURIComponent(adminKey)}`);
+      const data = await res.json();
+      allPosts = data.posts || [];
+      const pub = allPosts.filter(p => p.published).length;
+      document.getElementById('statTotal').textContent = allPosts.length;
+      document.getElementById('statPub').textContent = pub;
+      document.getElementById('statDraft').textContent = allPosts.length - pub;
+      renderPostsTable();
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadKeywords() {
+    try {
+      const res = await fetch(`${API}/admin/keywords?key=${encodeURIComponent(adminKey)}`);
+      const data = await res.json();
+      document.getElementById('statSearch').textContent = data.total_searches || 0;
+      const kws = (data.top_keywords || []).slice(0, 12);
+      if (!kws.length) return;
+      document.getElementById('kwGrid').innerHTML = kws.map(k => `
+        <span class="kw-pill" onclick="openEditorFromKeyword('${k.keyword}')">
+          ${k.keyword} <span class="kw-count">${k.count}</span>
+        </span>`).join('');
+    } catch(e) {}
+  }
+
+  function renderPostsTable() {
+    const tbody = document.getElementById('postsBody');
+    if (!allPosts.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="icon">📝</div><p>Belum ada artikel. Bikin yang pertama!</p></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = allPosts.map(p => `
+      <tr>
+        <td style="font-weight:600;max-width:280px">${p.thumb||'📝'} ${p.title}</td>
+        <td style="color:var(--muted)">${p.category||'—'}</td>
+        <td style="color:var(--muted);font-size:12px">${p.date_str||'—'}</td>
+        <td><span class="pub-badge ${p.published?'pub-yes':'pub-no'}">${p.published?'Published':'Draft'}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="btn-edit"   onclick="openEditor('${p.slug}')">Edit</button>
+            <button class="btn-toggle" onclick="togglePost('${p.slug}')">${p.published?'Unpublish':'Publish'}</button>
+            <button class="btn-delete" onclick="deletePost('${p.slug}','${p.title.replace(/'/g,"\\'")}')">Hapus</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  // ── Editor ────────────────────────────────────────────
+  function showDash() {
+    document.getElementById('editorView').classList.remove('active');
+    document.getElementById('dashView').classList.add('active');
+    editingSlug = null;
+  }
+
+  function openEditor(slug) {
+    document.getElementById('dashView').classList.remove('active');
+    document.getElementById('editorView').classList.add('active');
+    clearForm();
+    if (slug) {
+      editingSlug = slug;
+      document.getElementById('editorTitle').textContent = 'Edit artikel';
+      const post = allPosts.find(p => p.slug === slug);
+      if (post) prefillForm(post);
+      // Fetch full post for body
+      fetch(`${API}/admin/posts?key=${adminKey}`)
+        .then(r=>r.json()).then(d=>{
+          const full = (d.posts||[]).find(p=>p.slug===slug);
+          if (full?.body) document.getElementById('fBody').value = full.body;
+        });
+    } else {
+      editingSlug = null;
+      document.getElementById('editorTitle').textContent = 'Artikel baru';
+      // Default date
+      document.getElementById('fDate').value = new Date().toLocaleDateString('id-ID',{year:'numeric',month:'long'});
+      document.getElementById('fReadTime').value = '3 menit baca';
+    }
+  }
+
+  function openEditorFromKeyword(keyword) {
+    openEditor();
+    // Pre-fill title suggestion
+    const title = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+    document.getElementById('fTitle').value = title;
+    document.getElementById('fSlug').value = keyword.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  }
+
+  function clearForm() {
+    ['fTitle','fSlug','fThumb','fDate','fReadTime','fTags','fBody'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fCat').value = 'Tips';
+    document.getElementById('fCatClass').value = 'cat-tips';
+  }
+
+  function prefillForm(p) {
+    document.getElementById('fTitle').value = p.title||'';
+    document.getElementById('fSlug').value = p.slug||'';
+    document.getElementById('fThumb').value = p.thumb||'';
+    document.getElementById('fDate').value = p.date_str||'';
+    document.getElementById('fReadTime').value = p.read_time||'';
+    document.getElementById('fTags').value = p.tags||'';
+    document.getElementById('fCat').value = p.category||'Tips';
+    document.getElementById('fCatClass').value = p.cat_class||'cat-tips';
+  }
+
+  function syncCatClass() {
+    const map = { 'Tips':'cat-tips', 'Review':'cat-review', 'Panduan':'cat-panduan', 'Promo':'cat-promo' };
+    document.getElementById('fCatClass').value = map[document.getElementById('fCat').value] || 'cat-tips';
+  }
+
+  // Auto-generate slug from title
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('fTitle').addEventListener('input', function() {
+      if (!editingSlug) {
+        document.getElementById('fSlug').value = this.value.toLowerCase()
+          .replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
+      }
+    });
+  });
+
+  async function savePost(published) {
+    const title = document.getElementById('fTitle').value.trim();
+    const slug  = document.getElementById('fSlug').value.trim();
+    const body  = document.getElementById('fBody').value.trim();
+    if (!title || !slug) { showToast('❌ Judul dan slug wajib diisi!'); return; }
+
+    const payload = {
+      title, slug, body, published,
+      category:  document.getElementById('fCat').value,
+      cat_class: document.getElementById('fCatClass').value,
+      date_str:  document.getElementById('fDate').value,
+      read_time: document.getElementById('fReadTime').value,
+      thumb:     document.getElementById('fThumb').value || '📝',
+      tags:      document.getElementById('fTags').value,
+    };
+
+    try {
+      const url    = editingSlug ? `${API}/admin/posts/${editingSlug}` : `${API}/admin/posts`;
+      const method = editingSlug ? 'PUT' : 'POST';
+      const res    = await fetch(url + `?key=${adminKey}`, {
+        method, headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast('❌ ' + (data.error || 'Gagal menyimpan')); return; }
+      showToast(published ? '✓ Artikel dipublish!' : '✓ Draft disimpan!');
+      await loadPosts();
+      setTimeout(() => showDash(), 800);
+    } catch(e) {
+      showToast('❌ Gagal terhubung ke server');
+    }
+  }
+
+  async function togglePost(slug) {
+    try {
+      const res  = await fetch(`${API}/admin/posts/${slug}/toggle?key=${adminKey}`, { method: 'PATCH', headers: { 'x-admin-key': adminKey } });
+      const data = await res.json();
+      showToast(data.post?.published ? '✓ Dipublish' : '✓ Dijadikan draft');
+      await loadPosts();
+    } catch(e) { showToast('❌ Gagal'); }
+  }
+
+  async function deletePost(slug, title) {
+    if (!confirm(`Hapus artikel "${title}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+    try {
+      await fetch(`${API}/admin/posts/${slug}?key=${adminKey}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+      showToast('✓ Artikel dihapus');
+      await loadPosts();
+    } catch(e) { showToast('❌ Gagal menghapus'); }
+  }
+
+  function previewPost() {
+    const slug = document.getElementById('fSlug').value.trim() || 'preview';
+    window.open(`/article.html?slug=${slug}`, '_blank');
+  }
+
+  // ── Toast ─────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

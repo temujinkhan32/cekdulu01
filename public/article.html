@@ -267,7 +267,7 @@
     if (q) window.location.href = '/?q=' + encodeURIComponent(q);
   }
 
-  // ── Article data (akan diganti fetch dari API nanti) ──
+  // ── Static fallback articles (dipakai kalau API belum ada data) ──
   const articles = {
     'cara-hemat-belanja': {
       title: '5 Cara Dapat Harga Termurah di Marketplace Indonesia',
@@ -437,23 +437,63 @@
     }
   };
 
-  // ── Load article from URL slug ────────────────────────
-  function loadArticle() {
+  // ── Load article: API dulu, fallback ke static ────────
+  async function loadArticle() {
     const slug = new URLSearchParams(window.location.search).get('slug') || 'cara-hemat-belanja';
-    const article = articles[slug] || articles['cara-hemat-belanja'];
 
-    document.getElementById('pageTitle').textContent = article.title + ' – CekDulu';
-    document.getElementById('pageDesc').setAttribute('content', article.title + '. Tips belanja cerdas dari CekDulu.');
-    document.getElementById('breadcrumbTitle').textContent = article.title.length > 40 ? article.title.slice(0, 40) + '…' : article.title;
-    document.getElementById('articleTitle').textContent = article.title;
-    document.getElementById('articleCat').textContent = article.cat;
-    document.getElementById('articleCat').className = 'article-cat ' + article.catClass;
-    document.getElementById('articleDate').textContent = article.date;
-    document.getElementById('articleReadTime').textContent = article.readTime;
-    document.getElementById('articleThumb').textContent = article.thumb;
-    document.getElementById('articleBody').innerHTML = article.body;
+    // Coba fetch dari API
+    try {
+      const res = await fetch(`/posts/${slug}`);
+      if (res.ok) {
+        const p = await res.json();
+        renderArticle({
+          title: p.title, cat: p.category, catClass: p.cat_class,
+          date: p.date_str, readTime: p.read_time, thumb: p.thumb,
+          body: p.body,
+          tags: p.tags ? p.tags.split(',').map(t => t.trim()).filter(Boolean) : []
+        });
+        loadRelated();
+        return;
+      }
+    } catch(e) {}
+
+    // Fallback ke static
+    const article = articles[slug] || articles['cara-hemat-belanja'];
+    renderArticle(article);
+  }
+
+  function renderArticle(a) {
+    document.getElementById('pageTitle').textContent = a.title + ' – CekDulu';
+    document.getElementById('pageDesc').setAttribute('content', a.title + '. Tips belanja cerdas dari CekDulu.');
+    document.getElementById('breadcrumbTitle').textContent = a.title.length > 40 ? a.title.slice(0, 40) + '…' : a.title;
+    document.getElementById('articleTitle').textContent = a.title;
+    document.getElementById('articleCat').textContent = a.cat;
+    document.getElementById('articleCat').className = 'article-cat ' + a.catClass;
+    document.getElementById('articleDate').textContent = a.date;
+    document.getElementById('articleReadTime').textContent = a.readTime;
+    document.getElementById('articleThumb').textContent = a.thumb;
+    document.getElementById('articleBody').innerHTML = a.body;
     document.getElementById('articleTags').innerHTML =
-      article.tags.map(t => `<span class="tag">${t}</span>`).join('');
+      (a.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+  }
+
+  // Load artikel terkait dari API
+  async function loadRelated() {
+    try {
+      const res = await fetch('/posts?limit=5');
+      const data = await res.json();
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const others = (data.posts || []).filter(p => p.slug !== slug).slice(0, 4);
+      if (!others.length) return;
+      document.getElementById('relatedList').innerHTML = others.map(p => `
+        <a class="related-item" href="/article.html?slug=${p.slug}">
+          <div class="related-thumb">${p.thumb || '📝'}</div>
+          <div>
+            <p class="related-title">${p.title}</p>
+            <p class="related-meta">${p.category || ''} · ${p.read_time || ''}</p>
+          </div>
+        </a>`).join('');
+    } catch(e) {}
   }
 
   loadArticle();

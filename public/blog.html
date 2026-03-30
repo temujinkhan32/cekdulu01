@@ -173,68 +173,9 @@
 
   <!-- ARTICLES -->
   <p class="section-label">Artikel terbaru</p>
-  <div class="blog-grid">
-
-    <a class="blog-card" href="/article.html?slug=cara-hemat-belanja" style="text-decoration:none;color:inherit">
-      <div class="blog-thumb thumb-orange">🎧</div>
-      <div class="blog-body">
-        <span class="blog-cat cat-review">Review</span>
-        <p class="blog-title">Sony WH-1000XM5 vs XM4: Mana yang Worth It di 2026?</p>
-        <p class="blog-excerpt">Perbandingan lengkap dua headphone premium Sony. Perbedaan harga, kualitas audio, dan fitur noise-cancelling yang perlu kamu tahu sebelum beli.</p>
-        <div class="blog-meta"><span>📅 Mar 2026</span><span>⏱ 6 mnt</span></div>
-      </div>
-    </a>
-
-    <a class="blog-card" href="/article.html?slug=tokopedia-vs-shopee" style="text-decoration:none;color:inherit">
-      <div class="blog-thumb thumb-green">🛒</div>
-      <div class="blog-body">
-        <span class="blog-cat cat-panduan">Panduan</span>
-        <p class="blog-title">Tokopedia vs Shopee vs Lazada: Mana yang Paling Murah?</p>
-        <p class="blog-excerpt">Perbandingan jujur tiga marketplace terbesar Indonesia — harga, ongkos kirim, dan promo rutin di masing-masing platform.</p>
-        <div class="blog-meta"><span>📅 Mar 2026</span><span>⏱ 5 mnt</span></div>
-      </div>
-    </a>
-
-    <a class="blog-card" href="/article.html?slug=hp-terbaik-3-juta" style="text-decoration:none;color:inherit">
-      <div class="blog-thumb thumb-blue">📱</div>
-      <div class="blog-body">
-        <span class="blog-cat cat-review">Review</span>
-        <p class="blog-title">HP Terbaik di Bawah 3 Juta: Rekomendasi 2026</p>
-        <p class="blog-excerpt">Budget terbatas bukan halangan dapat HP bagus. 7 smartphone terbaik dengan harga di bawah 3 juta yang layak dibeli tahun ini.</p>
-        <div class="blog-meta"><span>📅 Mar 2026</span><span>⏱ 7 mnt</span></div>
-      </div>
-    </a>
-
-    <a class="blog-card" href="/article.html?slug=laptop-gaming-kapan-beli" style="text-decoration:none;color:inherit">
-      <div class="blog-thumb thumb-yellow">🎮</div>
-      <div class="blog-body">
-        <span class="blog-cat cat-promo">Promo</span>
-        <p class="blog-title">Kapan Waktu Terbaik Beli Laptop Gaming?</p>
-        <p class="blog-excerpt">Harbolnas, 11.11, 12.12, atau pas biasa? Kami lacak histori harga laptop gaming selama setahun untuk cari waktu paling murah.</p>
-        <div class="blog-meta"><span>📅 Feb 2026</span><span>⏱ 5 mnt</span></div>
-      </div>
-    </a>
-
-    <a class="blog-card" href="/article.html?slug=cara-hemat-belanja" style="text-decoration:none;color:inherit">
-      <div class="blog-thumb thumb-red">🏠</div>
-      <div class="blog-body">
-        <span class="blog-cat cat-tips">Tips</span>
-        <p class="blog-title">10 Produk Rumah Tangga yang Beda Harga Jauh Antar Marketplace</p>
-        <p class="blog-excerpt">Harga peralatan rumah tangga bisa beda 30–40% antara satu marketplace dan lainnya. Cek daftar lengkapnya di sini.</p>
-        <div class="blog-meta"><span>📅 Feb 2026</span><span>⏱ 4 mnt</span></div>
-      </div>
-    </a>
-
-    <a class="blog-card" href="/article.html?slug=tokopedia-vs-shopee" style="text-decoration:none;color:inherit">
-      <div class="blog-thumb thumb-gray">⌚</div>
-      <div class="blog-body">
-        <span class="blog-cat cat-review">Review</span>
-        <p class="blog-title">Samsung Galaxy Watch 6 vs Apple Watch SE: Mana untuk Kamu?</p>
-        <p class="blog-excerpt">Dua smartwatch populer di harga yang berdekatan — kami bandingkan fitur, akurasi sensor, dan daya tahan baterai secara head-to-head.</p>
-        <div class="blog-meta"><span>📅 Feb 2026</span><span>⏱ 6 mnt</span></div>
-      </div>
-    </a>
-
+  <div class="blog-grid" id="blogGrid">
+    <!-- diisi oleh JavaScript -->
+    <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted);font-size:13px">Memuat artikel…</div>
   </div>
 
   <!-- CTA BANNER -->
@@ -281,6 +222,10 @@
 </div>
 
 <script>
+  const THUMB_COLORS = ['thumb-orange','thumb-green','thumb-blue','thumb-yellow','thumb-red','thumb-gray'];
+  let allPosts = [];
+  let activeFilter = 'Semua';
+
   document.getElementById('searchInput').addEventListener('keypress', e => {
     if (e.key === 'Enter') goSearch();
   });
@@ -289,13 +234,90 @@
     if (q) window.location.href = '/?q=' + encodeURIComponent(q);
   }
 
-  // Category filter buttons (UI only for now)
+  // Category filters
   document.querySelectorAll('.cat-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      activeFilter = btn.textContent.trim();
+      renderGrid();
     });
   });
+
+  // ── Fetch posts from API ──
+  async function loadPosts() {
+    try {
+      const res = await fetch('/posts?limit=50');
+      const data = await res.json();
+      allPosts = data.posts || [];
+      if (allPosts.length) {
+        renderFeatured(allPosts[0]);
+        renderGrid();
+      } else {
+        showFallback();
+      }
+    } catch(e) {
+      showFallback();
+    }
+  }
+
+  function renderFeatured(p) {
+    const featured = document.querySelector('.featured');
+    if (!featured || !p) return;
+    featured.href = `/article.html?slug=${p.slug}`;
+    featured.querySelector('h2').textContent = p.title;
+    featured.querySelector('p').textContent = ''; // no excerpt in listing data
+    featured.querySelector('.featured-thumb').textContent = p.thumb || '📝';
+    featured.querySelector('.featured-tag').textContent = p.category || 'Artikel pilihan';
+    const meta = featured.querySelector('.featured-meta');
+    meta.innerHTML = `<span>📅 ${p.date_str||''}</span><span>⏱ ${p.read_time||''}</span><span>${p.category||''}</span>`;
+  }
+
+  function renderGrid() {
+    const filtered = activeFilter === 'Semua' ? allPosts
+      : allPosts.filter(p => p.category === activeFilter || (activeFilter === 'Tips Belanja' && p.category === 'Tips') || (activeFilter === 'Review Produk' && p.category === 'Review'));
+
+    if (!filtered.length) {
+      document.getElementById('blogGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted);font-size:13px;font-weight:500">Belum ada artikel di kategori ini.</div>`;
+      return;
+    }
+
+    document.getElementById('blogGrid').innerHTML = filtered.map((p, i) => {
+      const color = THUMB_COLORS[i % THUMB_COLORS.length];
+      return `<a class="blog-card" href="/article.html?slug=${p.slug}" style="text-decoration:none;color:inherit">
+        <div class="blog-thumb ${color}">${p.thumb || '📝'}</div>
+        <div class="blog-body">
+          <span class="blog-cat ${p.cat_class || 'cat-tips'}">${p.category || 'Tips'}</span>
+          <p class="blog-title">${p.title}</p>
+          <div class="blog-meta">
+            <span>📅 ${p.date_str || ''}</span>
+            <span>⏱ ${p.read_time || ''}</span>
+          </div>
+        </div>
+      </a>`;
+    }).join('');
+  }
+
+  function showFallback() {
+    // Tampilkan artikel static sebagai fallback kalau API belum ada data
+    const fallback = [
+      { slug:'cara-hemat-belanja', thumb:'💡', cat_class:'cat-tips', category:'Tips', title:'5 Cara Dapat Harga Termurah di Marketplace Indonesia', date_str:'Mar 2026', read_time:'4 mnt', color:'thumb-orange' },
+      { slug:'tokopedia-vs-shopee', thumb:'🛒', cat_class:'cat-panduan', category:'Panduan', title:'Tokopedia vs Shopee vs Lazada: Mana Paling Murah?', date_str:'Mar 2026', read_time:'5 mnt', color:'thumb-green' },
+      { slug:'hp-terbaik-3-juta', thumb:'📱', cat_class:'cat-review', category:'Review', title:'HP Terbaik di Bawah 3 Juta: Rekomendasi 2026', date_str:'Mar 2026', read_time:'7 mnt', color:'thumb-blue' },
+      { slug:'laptop-gaming-kapan-beli', thumb:'🎮', cat_class:'cat-promo', category:'Promo', title:'Kapan Waktu Terbaik Beli Laptop Gaming?', date_str:'Feb 2026', read_time:'5 mnt', color:'thumb-yellow' },
+    ];
+    document.getElementById('blogGrid').innerHTML = fallback.map(p => `
+      <a class="blog-card" href="/article.html?slug=${p.slug}" style="text-decoration:none;color:inherit">
+        <div class="blog-thumb ${p.color}">${p.thumb}</div>
+        <div class="blog-body">
+          <span class="blog-cat ${p.cat_class}">${p.category}</span>
+          <p class="blog-title">${p.title}</p>
+          <div class="blog-meta"><span>📅 ${p.date_str}</span><span>⏱ ${p.read_time}</span></div>
+        </div>
+      </a>`).join('');
+  }
+
+  loadPosts();
 </script>
 </body>
 </html>
