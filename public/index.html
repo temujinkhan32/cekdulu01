@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CekDulu – Bandingkan Harga di Semua Marketplace Indonesia</title>
+  <meta name="description" content="Cari produk sekali, bandingkan harga dari Tokopedia, Shopee, Lazada, dan Bukalapak sekaligus. Gratis dan transparan." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --accent:  #E8460A;
+      --accent2: #1D9E75;
+      --bg:      #F5F3EE;
+      --card:    #fff;
+      --text:    #1a1a18;
+      --muted:   #6B6A65;
+      --border:  rgba(0,0,0,0.12);
+      --line:    #D3D1C7;
+      --radius:  14px;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .app { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+
+    /* ── NAV ── */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2.5rem; }
+    .logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent); text-decoration: none; }
+    .logo sup { font-size: 10px; font-weight: 500; color: var(--muted); margin-left: 2px; vertical-align: super; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; cursor: pointer; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-badge { background: #FAECE7; color: #D85A30; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 700; border: 1px solid #F5C4B3; }
+
+    /* ── HERO ── */
+    .hero { text-align: center; padding: 2.5rem 0 2rem; }
+    .hero h1 { font-size: clamp(28px,5vw,42px); font-weight: 700; line-height: 1.15; letter-spacing: -1px; margin-bottom: .65rem; }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero p { font-size: 14px; color: var(--muted); max-width: 500px; margin: 0 auto 2rem; line-height: 1.7; }
+
+    /* ── SEARCH ── */
+    .search-wrap { max-width: 620px; margin: 0 auto; }
+    .search-bar { display: flex; align-items: center; background: var(--card); border: 2px solid var(--line); border-radius: 50px; padding: 6px 6px 6px 20px; gap: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.08); transition: border-color .2s; }
+    .search-bar:focus-within { border-color: var(--accent); }
+    .search-bar input { flex: 1; border: none; outline: none; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif; background: transparent; color: var(--text); }
+    .search-bar input::placeholder { color: #B4B2A9; }
+    .search-btn { background: var(--accent); color: #fff; border: none; border-radius: 50px; padding: 10px 22px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
+    .search-btn:hover { opacity: .88; }
+    .search-hints { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+    .hint-pill { background: #E8E6DF; color: #444441; font-size: 12px; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: 600; border: 1px solid var(--line); transition: background .2s; }
+    .hint-pill:hover { background: var(--line); }
+
+    /* ── MARKETPLACE PILLS ── */
+    .mkt-logos { display: flex; gap: 10px; justify-content: center; margin-top: 2rem; flex-wrap: wrap; }
+    .mkt-logo { display: flex; align-items: center; gap: 6px; background: var(--card); border: 1.5px solid var(--line); border-radius: 50px; padding: 7px 16px; font-size: 12px; font-weight: 700; color: var(--text); }
+    .mkt-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── CARA KERJA ── */
+    .section { margin: 3rem 0; }
+    .section-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 1rem; text-align: center; }
+    .section-heading { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: .5rem; letter-spacing: -.3px; }
+    .section-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 2rem; line-height: 1.6; }
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+    .step-card { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
+    .step-num { width: 32px; height: 32px; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+    .step-icon { font-size: 24px; margin-bottom: 10px; }
+    .step-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .step-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── DISCLAIMER ── */
+    .free-banner { background: linear-gradient(135deg, #04342C, #0F6E56); border-radius: var(--radius); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .free-left h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .free-left p { font-size: 13px; color: rgba(255,255,255,.75); line-height: 1.6; max-width: 440px; }
+    .free-badge-big { background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.3); border-radius: 12px; padding: 10px 20px; text-align: center; flex-shrink: 0; }
+    .free-badge-big span { font-size: 22px; font-weight: 700; color: #fff; display: block; }
+    .free-badge-big small { font-size: 11px; color: rgba(255,255,255,.7); font-weight: 500; }
+    .disclaimer-banner { background: #FFF8F0; border: 1.5px solid #FAC775; border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+    .disclaimer-header { display: flex; align-items: center; gap: 10px; margin-bottom: .75rem; }
+    .disclaimer-icon { width: 30px; height: 30px; background: #FAEEDA; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; border: 1px solid #FAC775; }
+    .disclaimer-title { font-size: 14px; font-weight: 700; color: #633806; }
+    .disclaimer-badge { margin-left: auto; background: #FAC775; color: #412402; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+    .disclaimer-body { font-size: 13px; color: #633806; line-height: 1.75; }
+    .disclaimer-body strong { font-weight: 700; }
+    .disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    .disc-card { background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 1rem; }
+    .disc-card-icon { font-size: 20px; margin-bottom: 8px; }
+    .disc-card-title { font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+    .disc-card-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); margin-top: 3rem; padding: 1.5rem 0 2rem; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .footer-brand p { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 220px; line-height: 1.6; }
+    .footer-links-grid { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .footer-col h4 { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 10px; }
+    .footer-col a { display: block; font-size: 12px; color: var(--muted); text-decoration: none; margin-bottom: 6px; font-weight: 500; transition: color .15s; }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .footer-bottom p { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .footer-mkt { display: flex; gap: 6px; flex-wrap: wrap; }
+    .footer-mkt span { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+
+    /* ── RESULTS VIEW ── */
+    .back-btn { background: #E8E6DF; color: var(--text); border: 1.5px solid var(--line); border-radius: 50px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: background .2s; }
+    .back-btn:hover { background: var(--line); }
+
+    /* Loading */
+    .loading { display: none; text-align: center; padding: 2.5rem; }
+    .loading.show { display: block; }
+    .spinner { width: 30px; height: 30px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeUp .3s ease forwards; }
+
+    /* AI panel */
+    .ai-panel { background: linear-gradient(135deg, #04342C, #0F6E56); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; color: #fff; }
+    .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: .75rem; }
+    .ai-icon { width: 26px; height: 26px; background: rgba(255,255,255,.2); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .ai-title { font-size: 13px; font-weight: 700; opacity: .9; }
+    .ai-label { font-size: 11px; background: rgba(255,255,255,.2); padding: 2px 9px; border-radius: 20px; margin-left: auto; font-weight: 600; }
+    .ai-summary { font-size: 13px; line-height: 1.75; opacity: .95; margin-bottom: 1rem; }
+    .ai-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ai-tag { font-size: 11px; background: rgba(255,255,255,.15); padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 4px; font-weight: 600; }
+    .tag-pos { color: #9FE1CB; } .tag-neg { color: #F5C4B3; }
+
+    /* Filters */
+    .filters { display: flex; gap: 8px; margin: 1.5rem 0 1.25rem; flex-wrap: wrap; }
+    .filter-btn { display: flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); border-radius: 50px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; background: #E8E6DF; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s; }
+    .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+    .filter-btn:hover:not(.active) { background: var(--line); }
+
+    /* Results grid */
+    .slabel { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 1rem; }
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .product-card { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 1rem; transition: all .2s; }
+    .product-card:hover { border-color: #888780; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.09); }
+    .product-card.best-deal { border: 2px solid var(--accent2); }
+    .product-card.selected-for-compare { border: 2px solid #378ADD; background: #EEF5FC; }
+    .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .badge-deal { background: #C0DD97; color: #27500A; }
+    .badge-listed { background: #E8E6DF; color: #444441; }
+    .product-img { width: 100%; height: 110px; background: #F1EFE8; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 32px; border: 1px solid #E8E6DF; overflow: hidden; }
+    .product-img img { width: 100%; height: 100%; object-fit: contain; }
+    .product-name { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 6px; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .shop-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 6px; margin-bottom: 8px; }
+    .shop-shopee     { background: #F5C4B3; color: #993C1D; }
+    .shop-tokopedia  { background: #9FE1CB; color: #085041; }
+    .shop-lazada     { background: #B5D4F4; color: #0C447C; }
+    .shop-bukalapak  { background: #F7C1C1; color: #791F1F; }
+    .price-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+    .price { font-size: 17px; font-weight: 700; color: var(--accent); }
+    .no-price { font-size: 13px; font-weight: 500; color: var(--muted); }
+    .stars { font-size: 12px; color: var(--muted); margin-bottom: 10px; font-weight: 500; }
+    .stars span { color: #EF9F27; }
+    .cta-row { display: flex; gap: 6px; }
+    .btn-primary { flex: 1; background: var(--accent); color: #fff; border: none; border-radius: 50px; padding: 9px 0; font-size: 12px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: opacity .2s; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+    .btn-primary:hover { opacity: .85; }
+    .btn-compare { background: #E6F1FB; color: #0C447C; border: 1.5px solid #B5D4F4; border-radius: 50px; padding: 9px 10px; font-size: 11px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: all .2s; white-space: nowrap; }
+    .btn-compare:hover { background: #B5D4F4; }
+    .btn-compare.comparing { background: #378ADD; color: #fff; border-color: #378ADD; }
+
+    /* Compare bar */
+    .compare-bar { display: none; background: #EEF5FC; border: 1.5px solid #B5D4F4; border-radius: 12px; padding: 12px 16px; margin-bottom: 1.25rem; }
+    .compare-bar.show { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .compare-bar .clabel { font-size: 13px; font-weight: 700; color: #0C447C; }
+    .compare-bar .sel-name { font-size: 12px; color: #0C447C; background: #B5D4F4; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+    .compare-bar .chint { font-size: 12px; color: #185FA5; font-weight: 500; }
+    .btn-cancel { background: #fff; border: 1.5px solid #B5D4F4; border-radius: 50px; padding: 5px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; color: #185FA5; }
+
+    /* Compare table */
+    .compare-box { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 2rem; }
+    .compare-box table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .compare-box th { padding: 10px 14px; font-weight: 700; background: #E8E6DF; color: var(--muted); text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+    .compare-box td { padding: 10px 14px; border-top: 1px solid #E8E6DF; color: var(--text); }
+    .compare-box tr:hover td { background: var(--bg); }
+    .best-price-cell { color: var(--accent); font-weight: 700; }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border-radius: var(--radius); padding: 1.5rem; max-width: 780px; width: 90%; max-height: 88vh; overflow-y: auto; position: relative; border: 1.5px solid var(--line); }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; background: #E8E6DF; border: 1px solid var(--line); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text); font-weight: 700; }
+    .modal-close:hover { background: var(--line); }
+    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: .25rem; }
+    .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 1.25rem; font-weight: 500; }
+    .side-by-side { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .compare-col { background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px; padding: 1rem; }
+    .compare-col h3 { font-size: 13px; font-weight: 700; margin-bottom: 6px; line-height: 1.4; }
+    .compare-row-m { display: flex; justify-content: space-between; font-size: 12px; padding: 7px 0; border-top: 1px solid var(--line); margin-top: 6px; }
+    .compare-row-m .mlabel { color: var(--muted); font-weight: 600; }
+    .compare-row-m .mval { font-weight: 700; }
+    .winner { color: var(--accent2); }
+    .not-comparable { text-align: center; padding: 2rem 1rem; }
+    .not-comparable .icon { font-size: 40px; margin-bottom: .75rem; }
+    .not-comparable strong { color: var(--text); font-size: 15px; font-weight: 700; display: block; margin-bottom: .5rem; }
+    .not-comparable p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .side-by-side { grid-template-columns: 1fr; }
+      .free-banner { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="logo">CekDulu<sup>beta</sup></a>
+    <div class="nav-links">
+      <a onclick="scrollTo('caraKerja')">Cara kerja</a>
+      <a href="/blog.html">📝 Blog</a>
+      <span class="nav-badge">Indonesia 🇮🇩</span>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  HOME VIEW                                  -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="homeView">
+    <div class="hero">
+      <h1>CekDulu <em>Aja!</em></h1>
+      <p>Ketik nama produk yang mau kamu beli — kami cek harganya di Tokopedia, Shopee, Lazada, dan Bukalapak sekaligus.</p>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search-bar">
+        <input type="text" id="mainSearch" placeholder="Ketik nama produk atau paste URL marketplace..." />
+        <button class="search-btn" onclick="doSearch()">Cek Sekarang</button>
+      </div>
+      <div class="search-hints">
+        <span class="hint-pill" onclick="quickSearch('Sony WH-1000XM5')">Sony WH-1000XM5</span>
+        <span class="hint-pill" onclick="quickSearch('iPhone 15')">iPhone 15</span>
+        <span class="hint-pill" onclick="quickSearch('Xiaomi Robot Vacuum')">Xiaomi Robot Vacuum</span>
+        <span class="hint-pill" onclick="quickSearch('Samsung Galaxy Watch')">Samsung Galaxy Watch</span>
+      </div>
+    </div>
+
+    <div class="mkt-logos">
+      <div class="mkt-logo"><span class="mkt-dot" style="background:#D85A30"></span>Shopee</div>
+      <div class="mkt-logo"><span class="mkt-dot" style="background:#0F6E56"></span>Tokopedia</div>
+      <div class="mkt-logo"><span class="mkt-dot" style="background:#185FA5"></span>Lazada</div>
+      <div class="mkt-logo"><span class="mkt-dot" style="background:#A32D2D"></span>Bukalapak</div>
+    </div>
+
+    <!-- CARA KERJA -->
+    <div class="section" id="caraKerja">
+      <p class="section-label">Cara kerja</p>
+      <p class="section-heading">Simpel. Cepat. Gratis.</p>
+      <p class="section-sub">Tiga langkah untuk temukan harga terbaik produk pilihanmu</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-icon">🔍</div>
+          <p class="step-title">Ketik atau paste link produk</p>
+          <p class="step-desc">Masukkan nama produk, merk, atau langsung paste URL dari Shopee, Tokopedia, Lazada, atau Bukalapak.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-icon">⚡</div>
+          <p class="step-title">Kami bandingkan otomatis</p>
+          <p class="step-desc">CekDulu mencari harga di semua marketplace secara real-time dan menampilkan hasil dalam hitungan detik.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-icon">🛒</div>
+          <p class="step-title">Pilih & langsung beli</p>
+          <p class="step-desc">Klik tombol beli dan kamu akan diarahkan ke marketplace untuk menyelesaikan pembelian dengan aman.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO PENTING -->
+    <div class="section" id="disclaimer">
+      <p class="section-label">Info penting</p>
+      <p class="section-heading">Transparansi adalah prioritas kami</p>
+      <p class="section-sub">Baca ini dulu ya — singkat kok!</p>
+
+      <div class="free-banner">
+        <div class="free-left">
+          <h3>100% Gratis untuk semua pengguna</h3>
+          <p>CekDulu tidak memungut biaya apapun. Gunakan fitur perbandingan harga dan semua fitur lainnya secara bebas dan tanpa batas.</p>
+        </div>
+        <div class="free-badge-big">
+          <span>Rp 0</span>
+          <small>Selamanya gratis</small>
+        </div>
+      </div>
+
+      <div class="disclaimer-banner">
+        <div class="disclaimer-header">
+          <div class="disclaimer-icon">⚠️</div>
+          <span class="disclaimer-title">Informasi yang perlu kamu tahu</span>
+          <span class="disclaimer-badge">Wajib baca</span>
+        </div>
+        <p class="disclaimer-body">
+          <strong>🔗 Link Afiliasi:</strong> Semua tautan produk di CekDulu adalah <strong>link afiliasi</strong>. Kami mendapatkan komisi kecil dari marketplace ketika kamu membeli melalui link kami — <strong>tanpa biaya tambahan apapun dari kamu</strong>. Harga yang kamu bayar tetap sama.<br><br>
+          <strong>📊 Data Harga:</strong> Harga produk bisa berubah mengikuti promo masing-masing marketplace. Harga yang tampil adalah hasil pencarian terkini, namun <strong>kami tidak menjamin keakuratan harga secara real-time</strong>. Selalu cek harga akhir di halaman checkout marketplace.
+        </p>
+      </div>
+
+      <div class="disc-grid">
+        <div class="disc-card">
+          <div class="disc-card-icon">🔒</div>
+          <p class="disc-card-title">Data kamu aman</p>
+          <p class="disc-card-desc">Kami tidak menyimpan riwayat pencarianmu atau data pribadi apapun.</p>
+        </div>
+        <div class="disc-card">
+          <div class="disc-card-icon">💸</div>
+          <p class="disc-card-title">Komisi transparan</p>
+          <p class="disc-card-desc">Komisi afiliasi tidak mempengaruhi rekomendasi atau urutan harga yang ditampilkan.</p>
+        </div>
+        <div class="disc-card">
+          <div class="disc-card-icon">🛡️</div>
+          <p class="disc-card-title">Tidak ada bias produk</p>
+          <p class="disc-card-desc">Urutan hasil didasarkan pada harga dan relevansi, bukan siapa yang bayar lebih.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="/" class="logo">CekDulu<sup>beta</sup></a>
+          <p>Platform perbandingan harga produk marketplace Indonesia. Gratis dan transparan.</p>
+        </div>
+        <div class="footer-links-grid">
+          <div class="footer-col">
+            <h4>Platform</h4>
+            <a onclick="scrollTo('caraKerja')">Cara kerja</a>
+            <a href="/blog.html">Blog</a>
+          </div>
+          <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="#">Kebijakan privasi</a>
+            <a href="#">Syarat & ketentuan</a>
+            <a href="#">Disclosure afiliasi</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 CekDulu. Dibuat dengan ❤️ untuk konsumen Indonesia.</p>
+        <div class="footer-mkt">
+          <span class="shop-badge shop-shopee">Shopee</span>
+          <span class="shop-badge shop-tokopedia">Tokopedia</span>
+          <span class="shop-badge shop-lazada">Lazada</span>
+          <span class="shop-badge shop-bukalapak">Bukalapak</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  RESULTS VIEW                               -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="resultsView" style="display:none">
+
+    <!-- Top bar: back + inline search -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap">
+      <button class="back-btn" onclick="goHome()">← Kembali</button>
+      <div class="search-bar" style="flex:1;min-width:200px;box-shadow:none">
+        <input type="text" id="inlineSearch" placeholder="Cari produk lain..." />
+        <button class="search-btn" onclick="doInlineSearch()">Cek</button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loadingSpinner">
+      <div class="spinner"></div>
+      <p style="font-size:13px;color:var(--muted);font-weight:500">Lagi cek harga di semua marketplace…</p>
+    </div>
+
+    <!-- Results content -->
+    <div id="resultsContent" style="display:none">
+
+      <!-- Compare bar -->
+      <div class="compare-bar" id="compareBar">
+        <span class="clabel">Bandingkan:</span>
+        <span class="sel-name" id="compareBarName"></span>
+        <span class="chint">→ pilih produk kedua</span>
+        <button class="btn-cancel" onclick="cancelCompare()">Batal</button>
+      </div>
+
+      <!-- AI Summary panel -->
+      <div class="ai-panel fade-in">
+        <div class="ai-header">
+          <div class="ai-icon">✦</div>
+          <span class="ai-title">Ringkasan harga</span>
+          <span class="ai-label" id="aiLabel">Dari semua marketplace</span>
+        </div>
+        <p class="ai-summary" id="aiSummary">Memuat ringkasan…</p>
+        <div class="ai-tags" id="aiTags"></div>
+      </div>
+
+      <!-- Marketplace filters -->
+      <div class="filters">
+        <button class="filter-btn active" onclick="filterMkt('all',this)"><span class="mkt-dot" style="background:#888"></span> Semua</button>
+        <button class="filter-btn" onclick="filterMkt('shopee',this)"><span class="mkt-dot" style="background:#D85A30"></span> Shopee</button>
+        <button class="filter-btn" onclick="filterMkt('tokopedia',this)"><span class="mkt-dot" style="background:#0F6E56"></span> Tokopedia</button>
+        <button class="filter-btn" onclick="filterMkt('lazada',this)"><span class="mkt-dot" style="background:#185FA5"></span> Lazada</button>
+        <button class="filter-btn" onclick="filterMkt('bukalapak',this)"><span class="mkt-dot" style="background:#A32D2D"></span> Bukalapak</button>
+      </div>
+
+      <p class="slabel">Hasil pencarian</p>
+      <div class="results-grid" id="resultsGrid"></div>
+
+      <p class="slabel">Perbandingan harga</p>
+      <div class="compare-box fade-in">
+        <table>
+          <thead><tr><th>Marketplace</th><th>Produk</th><th>Harga</th><th>Rating</th><th></th></tr></thead>
+          <tbody id="compareBody"></tbody>
+        </table>
+      </div>
+
+      <div style="background:#FFF8F0;border:1px solid #FAC775;border-radius:10px;padding:10px 14px;margin-bottom:3rem">
+        <p style="font-size:11px;color:#633806;line-height:1.6;font-weight:500">⚠️ <strong>Disclaimer:</strong> Semua link adalah link afiliasi. Harga dapat berubah sewaktu-waktu. Selalu cek harga akhir di halaman checkout marketplace.</p>
+      </div>
+
+    </div><!-- /resultsContent -->
+
+    <!-- Error state -->
+    <div id="errorState" style="display:none;text-align:center;padding:3rem 0">
+      <p style="font-size:36px;margin-bottom:12px">😕</p>
+      <p style="font-size:14px;color:var(--muted);font-weight:500" id="errorMsg">Gagal terhubung ke server.</p>
+    </div>
+
+  </div><!-- /resultsView -->
+
+</div><!-- /app -->
+
+<!-- COMPARE MODAL -->
+<div class="modal-overlay" id="compareModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <p class="modal-title" id="modalTitle">Perbandingan Produk</p>
+    <p class="modal-sub" id="modalSub"></p>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = ''; // kosong = Railway server yang sama
+  let allResults = [];
+  let currentFilter = 'all';
+  let comparingItem = null;
+
+  // ── Helpers ──────────────────────────────────────────
+  function scrollTo(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+  function quickSearch(q) { document.getElementById('mainSearch').value = q; doSearch(); }
+  function doInlineSearch() {
+    const q = document.getElementById('inlineSearch').value.trim();
+    if (!q) return;
+    document.getElementById('mainSearch').value = q;
+    doSearch();
+  }
+
+  // Enter key support
+  document.getElementById('mainSearch').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  document.getElementById('inlineSearch').addEventListener('keydown', e => { if (e.key === 'Enter') doInlineSearch(); });
+
+  // Auto-search from URL (?q=...)
+  window.onload = () => {
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (q) { document.getElementById('mainSearch').value = q; doSearch(); }
+  };
+
+  // ── Main search ───────────────────────────────────────
+  async function doSearch() {
+    const q = document.getElementById('mainSearch').value.trim();
+    if (!q) { document.getElementById('mainSearch').focus(); return; }
+
+    history.pushState({}, '', '?q=' + encodeURIComponent(q));
+    document.title = q + ' – CekDulu';
+    document.getElementById('inlineSearch').value = q;
+
+    cancelCompare();
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('resultsView').style.display = 'block';
+    document.getElementById('loadingSpinner').classList.add('show');
+    document.getElementById('resultsContent').style.display = 'none';
+    document.getElementById('errorState').style.display = 'none';
+
+    try {
+      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error('Server error ' + res.status);
+      const data = await res.json();
+
+      allResults = data.results || [];
+      currentFilter = 'all';
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.filter-btn').classList.add('active');
+
+      buildAiPanel(data);
+      renderCards(allResults);
+      renderTable(allResults);
+
+      document.getElementById('loadingSpinner').classList.remove('show');
+      document.getElementById('resultsContent').style.display = 'block';
+
+    } catch (err) {
+      document.getElementById('loadingSpinner').classList.remove('show');
+      document.getElementById('errorState').style.display = 'block';
+      document.getElementById('errorMsg').textContent = 'Gagal terhubung ke server. Pastikan backend sudah aktif di Railway.';
+    }
+  }
+
+  function buildAiPanel(data) {
+    const withPrice = allResults.filter(p => p.priceNum > 0);
+    const label = `${data.total} hasil ditemukan`;
+    document.getElementById('aiLabel').textContent = label;
+
+    if (withPrice.length > 0) {
+      const cheapest = withPrice.reduce((a, b) => a.priceNum < b.priceNum ? a : b);
+      const mpNames = { tokopedia: 'Tokopedia', shopee: 'Shopee', lazada: 'Lazada', bukalapak: 'Bukalapak' };
+      document.getElementById('aiSummary').textContent =
+        `Kami menemukan "${data.query}" di ${data.total} marketplace. Harga termurah saat ini di ${mpNames[cheapest.marketplace] || cheapest.marketplace} — ${cheapest.price}. Klik "Lihat deal" untuk melihat halaman produk langsung.`;
+
+      const tags = [];
+      if (withPrice.length > 0) tags.push({ t: `Harga termurah: ${cheapest.price}`, pos: true });
+      if (withPrice.length > 1) {
+        const pricedMp = [...new Set(withPrice.map(p => mpNames[p.marketplace]))];
+        tags.push({ t: `Ada di: ${pricedMp.join(', ')}`, pos: true });
+      }
+      const noPrice = allResults.filter(p => p.priceNum === 0);
+      if (noPrice.length > 0) tags.push({ t: `${noPrice.length} marketplace: klik untuk cek harga`, pos: false });
+
+      document.getElementById('aiTags').innerHTML = tags.map(t =>
+        `<span class="ai-tag"><span class="${t.pos ? 'tag-pos' : 'tag-neg'}">${t.pos ? '✓' : '→'}</span>${t.t}</span>`
+      ).join('');
+    } else {
+      document.getElementById('aiSummary').textContent =
+        `Ditemukan hasil untuk "${data.query}" di ${data.total} marketplace. Klik "Lihat deal" untuk melihat harga terbaru langsung di marketplace.`;
+      document.getElementById('aiTags').innerHTML = '';
+    }
+  }
+
+  // ── Render cards ──────────────────────────────────────
+  function renderCards(items) {
+    const filtered = currentFilter === 'all' ? items : items.filter(i => i.marketplace === currentFilter);
+    const grid = document.getElementById('resultsGrid');
+
+    if (!filtered.length) {
+      grid.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:1rem 0;font-weight:500">Tidak ada produk dari marketplace ini.</p>';
+      return;
+    }
+
+    // Mark cheapest with real price
+    const withPrice = filtered.filter(p => p.priceNum > 0);
+    const cheapestId = withPrice.length ? withPrice.reduce((a, b) => a.priceNum < b.priceNum ? a : b) : null;
+
+    const mpNames = { tokopedia: 'Tokopedia', shopee: 'Shopee', lazada: 'Lazada', bukalapak: 'Bukalapak' };
+    const mpEmoji = { tokopedia: '🟢', shopee: '🔴', lazada: '🔵', bukalapak: '🔴' };
+
+    grid.innerHTML = filtered.map((p, i) => {
+      const isBest = cheapestId && p === cheapestId;
+      const isSel  = comparingItem && comparingItem._idx === p._idx;
+      const mp     = p.marketplace;
+      const name   = mpNames[mp] || mp;
+
+      const thumb = p.image
+        ? `<div class="product-img"><img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.parentElement.textContent='${mpEmoji[mp]}'"></div>`
+        : `<div class="product-img">${mpEmoji[mp] || '🛒'}</div>`;
+
+      const priceHTML = p.priceNum > 0
+        ? `<div class="price-row"><span class="price">${p.price}</span></div>`
+        : `<div class="price-row"><span class="no-price">${p.price}</span></div>`;
+
+      const starsHTML = (p.rating && p.rating !== '-')
+        ? `<p class="stars"><span>★★★★★</span> ${p.rating}${p.reviews && p.reviews !== '-' ? ` (${Number(p.reviews).toLocaleString('id-ID')} ulasan)` : ''}</p>`
+        : '';
+
+      const noteHTML = p.note ? `<p style="font-size:11px;color:var(--muted);font-style:italic;margin-bottom:8px">${p.note}</p>` : '';
+
+      return `<div class="product-card ${isBest ? 'best-deal' : ''} ${isSel ? 'selected-for-compare' : ''} fade-in" style="animation-delay:${i * 0.06}s">
+        ${isBest ? '<span class="badge badge-deal">Harga terbaik</span>' : '<span class="badge badge-listed">Tersedia</span>'}
+        ${thumb}
+        <p class="product-name">${p.name}</p>
+        <span class="shop-badge shop-${mp}">${name}</span>
+        ${priceHTML}
+        ${starsHTML}
+        ${noteHTML}
+        <div class="cta-row">
+          <a href="${p.url}" target="_blank" rel="noopener sponsored" class="btn-primary">Lihat deal →</a>
+          <button class="btn-compare ${isSel ? 'comparing' : ''}" onclick='handleCompare(${i})'>
+            ${isSel ? 'Dipilih ✓' : 'Bandingkan'}
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Render price table ────────────────────────────────
+  function renderTable(items) {
+    const sorted = [...items].sort((a, b) => {
+      if (a.priceNum > 0 && b.priceNum === 0) return -1;
+      if (a.priceNum === 0 && b.priceNum > 0) return 1;
+      return a.priceNum - b.priceNum;
+    });
+    const mpNames = { tokopedia: 'Tokopedia', shopee: 'Shopee', lazada: 'Lazada', bukalapak: 'Bukalapak' };
+    document.getElementById('compareBody').innerHTML = sorted.map((p, i) => `
+      <tr>
+        <td><span class="shop-badge shop-${p.marketplace}">${mpNames[p.marketplace] || p.marketplace}</span></td>
+        <td style="max-width:200px;color:var(--muted);font-size:12px;font-weight:500">${p.name}</td>
+        <td class="${i === 0 && p.priceNum > 0 ? 'best-price-cell' : ''}">${p.price}${i === 0 && p.priceNum > 0 ? ' ✓' : ''}</td>
+        <td style="font-weight:600">${p.rating && p.rating !== '-' ? p.rating + ' ★' : '—'}</td>
+        <td><a href="${p.url}" target="_blank" rel="noopener sponsored" class="btn-primary" style="padding:5px 16px;font-size:11px;width:auto;flex:none;text-decoration:none">Beli</a></td>
+      </tr>`).join('');
+  }
+
+  // ── Filter ────────────────────────────────────────────
+  function filterMkt(mkt, btn) {
+    currentFilter = mkt;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCards(allResults);
+  }
+
+  // ── Compare ───────────────────────────────────────────
+  function handleCompare(idx) {
+    const filtered = currentFilter === 'all' ? allResults : allResults.filter(i => i.marketplace === currentFilter);
+    const product = { ...filtered[idx], _idx: idx };
+
+    if (comparingItem && comparingItem._idx === idx) { cancelCompare(); return; }
+    if (!comparingItem) {
+      comparingItem = product;
+      document.getElementById('compareBar').classList.add('show');
+      const n = product.name;
+      document.getElementById('compareBarName').textContent = n.length > 38 ? n.slice(0, 38) + '…' : n;
+      renderCards(allResults);
+    } else {
+      openModal(comparingItem, product);
+    }
+  }
+
+  function cancelCompare() {
+    comparingItem = null;
+    document.getElementById('compareBar').classList.remove('show');
+    renderCards(allResults);
+  }
+
+  function openModal(p1, p2) {
+    const sameType = p1.marketplace !== p2.marketplace ||
+      p1.name.split(' ')[0].toLowerCase() === p2.name.split(' ')[0].toLowerCase();
+
+    document.getElementById('compareModal').classList.add('show');
+    document.getElementById('modalTitle').textContent = 'Perbandingan Produk';
+
+    const mpNames = { tokopedia: 'Tokopedia', shopee: 'Shopee', lazada: 'Lazada', bukalapak: 'Bukalapak' };
+    const mpEmoji = { tokopedia: '🟢', shopee: '🔴', lazada: '🔵', bukalapak: '🔴' };
+    const ch = (!p1.priceNum && !p2.priceNum) ? -1 : p1.priceNum > 0 && (p2.priceNum === 0 || p1.priceNum < p2.priceNum) ? 0 : 1;
+    document.getElementById('modalSub').textContent = 'Perbandingan langsung dua produk';
+    document.getElementById('modalBody').innerHTML = `<div class="side-by-side">${[p1, p2].map((p, idx) => `
+      <div class="compare-col">
+        <div class="product-img" style="height:80px;margin-bottom:10px">${mpEmoji[p.marketplace] || '🛒'}</div>
+        <span class="shop-badge shop-${p.marketplace}" style="margin-bottom:8px;display:inline-block">${mpNames[p.marketplace] || p.marketplace}</span>
+        <h3>${p.name}</h3>
+        <div class="compare-row-m"><span class="mlabel">Harga</span><span class="mval ${idx === ch ? 'winner' : ''}">${p.price}${idx === ch ? ' 🏆' : ''}</span></div>
+        <div class="compare-row-m"><span class="mlabel">Rating</span><span class="mval">${p.rating !== '-' ? p.rating + ' ★' : '—'}</span></div>
+        <div class="compare-row-m"><span class="mlabel">Ulasan</span><span class="mval">${p.reviews !== '-' ? p.reviews : '—'}</span></div>
+        <div style="margin-top:12px"><a href="${p.url}" target="_blank" rel="noopener sponsored" class="btn-primary" style="width:100%;padding:9px 0;justify-content:center">Lihat deal →</a></div>
+      </div>`).join('')}</div>`;
+
+    cancelCompare();
+  }
+
+  function closeModal() { document.getElementById('compareModal').classList.remove('show'); }
+
+  function goHome() {
+    document.getElementById('resultsView').style.display = 'none';
+    document.getElementById('homeView').style.display = 'block';
+    cancelCompare();
+    history.pushState({}, '', '/');
+    document.title = 'CekDulu – Bandingkan Harga di Semua Marketplace Indonesia';
+  }
+
+  document.getElementById('compareModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>
