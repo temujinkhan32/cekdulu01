@@ -1,6 +1,6 @@
 {
   "name": "cekdulu-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Backend server untuk CekDulu - platform perbandingan harga marketplace Indonesia",
   "main": "server.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "pg": "^8.11.3"
   }
 }
