@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Artikel – CekDulu</title>
+  <meta name="description" id="pageDesc" content="Tips belanja cerdas dan perbandingan produk dari CekDulu." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --accent:  #E8460A;
+      --accent2: #1D9E75;
+      --bg:      #F5F3EE;
+      --card:    #fff;
+      --text:    #1a1a18;
+      --muted:   #6B6A65;
+      --border:  rgba(0,0,0,0.12);
+      --line:    #D3D1C7;
+      --radius:  14px;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .app { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+
+    /* ── NAV ── */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2.5rem; }
+    .logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent); text-decoration: none; }
+    .logo sup { font-size: 10px; font-weight: 500; color: var(--muted); margin-left: 2px; vertical-align: super; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-badge { background: #FAECE7; color: #D85A30; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 700; border: 1px solid #F5C4B3; }
+
+    /* ── LAYOUT ── */
+    .content-wrap { display: grid; grid-template-columns: 1fr 280px; gap: 2rem; align-items: start; }
+    @media (max-width: 720px) { .content-wrap { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb span { color: #B4B2A9; }
+
+    /* ── ARTICLE HEADER ── */
+    .article-header { margin-bottom: 2rem; }
+    .article-cat { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .3px; }
+    .cat-tips    { background: #FAECE7; color: #D85A30; border: 1px solid #F5C4B3; }
+    .cat-review  { background: #E0F7EE; color: #0F6E56; border: 1px solid #9FE1CB; }
+    .cat-panduan { background: #E6F1FB; color: #0C447C; border: 1px solid #B5D4F4; }
+    .cat-promo   { background: #FEF9E7; color: #7A5A00; border: 1px solid #FAC775; }
+
+    .article-title { font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: -.6px; line-height: 1.25; margin-bottom: .75rem; }
+    .article-meta { display: flex; gap: 14px; font-size: 12px; color: var(--muted); font-weight: 500; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .article-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .article-thumb { width: 100%; height: 220px; background: #F1EFE8; border: 1px solid var(--line); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 80px; margin-bottom: 2rem; }
+
+    /* ── ARTICLE BODY ── */
+    .article-body { font-size: 15px; line-height: 1.8; color: var(--text); }
+    .article-body h2 { font-size: 20px; font-weight: 700; letter-spacing: -.4px; margin: 2rem 0 .75rem; color: var(--text); }
+    .article-body h3 { font-size: 16px; font-weight: 700; margin: 1.5rem 0 .5rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.1rem; }
+    .article-body ul, .article-body ol { padding-left: 1.4rem; margin-bottom: 1.1rem; }
+    .article-body li { margin-bottom: .4rem; line-height: 1.7; }
+    .article-body strong { font-weight: 700; color: var(--text); }
+    .article-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+    .article-body a:hover { opacity: .8; }
+    .article-body blockquote { border-left: 3px solid var(--accent); padding: .75rem 1.25rem; background: #FEF3EC; border-radius: 0 10px 10px 0; margin: 1.5rem 0; font-style: italic; color: var(--muted); }
+    .article-body hr { border: none; border-top: 1px solid var(--line); margin: 2rem 0; }
+
+    /* Tip box */
+    .tip-box { background: #E0F7EE; border: 1.5px solid #9FE1CB; border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .tip-box .tip-label { font-size: 11px; font-weight: 700; color: #0F6E56; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .tip-box p { font-size: 14px; color: #0a4a38; line-height: 1.65; margin: 0; }
+
+    /* Warning box */
+    .warn-box { background: #FFF8F0; border: 1.5px solid #FAC775; border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .warn-box p { font-size: 14px; color: #633806; line-height: 1.65; margin: 0; }
+
+    /* Numbered list with cards */
+    .steps-list { list-style: none; padding: 0; margin: 1.5rem 0; display: flex; flex-direction: column; gap: .75rem; }
+    .steps-list li { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: .85rem 1rem .85rem 1.1rem; display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.6; }
+    .step-n { width: 24px; height: 24px; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── IN-ARTICLE CTA ── */
+    .inline-cta { background: linear-gradient(135deg, #04342C, #0F6E56); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 2rem 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .inline-cta p { font-size: 14px; color: rgba(255,255,255,.9); font-weight: 600; line-height: 1.5; }
+    .inline-cta small { display: block; font-size: 12px; color: rgba(255,255,255,.65); font-weight: 400; margin-top: 2px; }
+    .cta-btn { background: #fff; color: #04342C; border: none; border-radius: 50px; padding: 10px 22px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block; transition: opacity .2s; }
+    .cta-btn:hover { opacity: .88; }
+
+    /* ── TAGS ── */
+    .article-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+    .tag { background: #E8E6DF; color: #444441; font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 600; border: 1px solid var(--line); }
+
+    /* ── SIDEBAR ── */
+    .sidebar { position: sticky; top: 80px; }
+    .sidebar-card { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
+    .sidebar-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 1rem; }
+
+    /* Search in sidebar */
+    .side-search { display: flex; align-items: center; background: var(--bg); border: 1.5px solid var(--line); border-radius: 50px; padding: 5px 5px 5px 14px; gap: 6px; }
+    .side-search input { flex: 1; border: none; outline: none; font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif; background: transparent; color: var(--text); }
+    .side-search input::placeholder { color: #B4B2A9; }
+    .side-search button { background: var(--accent); color: #fff; border: none; border-radius: 50px; padding: 7px 14px; font-size: 12px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; white-space: nowrap; }
+
+    /* Related articles */
+    .related-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #E8E6DF; cursor: pointer; transition: opacity .15s; text-decoration: none; }
+    .related-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .related-item:hover { opacity: .75; }
+    .related-thumb { width: 48px; height: 48px; background: #F1EFE8; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; border: 1px solid #E8E6DF; }
+    .related-title { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .related-meta { font-size: 11px; color: var(--muted); font-weight: 500; }
+
+    /* Disclaimer */
+    .disclaimer-box { background: #FFF8F0; border: 1px solid #FAC775; border-radius: 10px; padding: 10px 14px; }
+    .disclaimer-box p { font-size: 11px; color: #633806; line-height: 1.6; font-weight: 500; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); margin-top: 3rem; padding: 1.5rem 0 2rem; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .footer-brand p { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 220px; line-height: 1.6; }
+    .footer-links-grid { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .footer-col h4 { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 10px; }
+    .footer-col a { display: block; font-size: 12px; color: var(--muted); text-decoration: none; margin-bottom: 6px; font-weight: 500; transition: color .15s; }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .footer-bottom p { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .footer-mkt { display: flex; gap: 6px; flex-wrap: wrap; }
+    .footer-mkt span { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+    .shop-shopee    { background: #F5C4B3; color: #993C1D; }
+    .shop-tokopedia { background: #9FE1CB; color: #085041; }
+    .shop-lazada    { background: #B5D4F4; color: #0C447C; }
+    .shop-bukalapak { background: #F7C1C1; color: #791F1F; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="logo">CekDulu<sup>beta</sup></a>
+    <div class="nav-links">
+      <a href="/">🔍 Bandingkan harga</a>
+      <a href="/blog.html">📝 Blog</a>
+      <span class="nav-badge">Indonesia 🇮🇩</span>
+    </div>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="/">Beranda</a>
+    <span>›</span>
+    <a href="/blog.html">Blog</a>
+    <span>›</span>
+    <span id="breadcrumbTitle">Artikel</span>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="content-wrap">
+
+    <!-- ARTICLE -->
+    <main>
+      <article>
+        <div class="article-header">
+          <span class="article-cat" id="articleCat">Tips</span>
+          <h1 class="article-title" id="articleTitle">Judul Artikel</h1>
+          <div class="article-meta">
+            <span>📅 <span id="articleDate">Maret 2026</span></span>
+            <span>⏱ <span id="articleReadTime">5 menit baca</span></span>
+            <span>✍️ Tim CekDulu</span>
+          </div>
+        </div>
+
+        <div class="article-thumb" id="articleThumb">💡</div>
+
+        <div class="article-body" id="articleBody">
+          <!-- Diisi oleh JavaScript dari data artikel -->
+          <p>Memuat artikel...</p>
+        </div>
+
+        <div class="article-tags" id="articleTags"></div>
+      </article>
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <p class="sidebar-label">Cek harga produk</p>
+        <div class="side-search">
+          <input type="text" id="sideSearch" placeholder="Nama produk..." />
+          <button onclick="goSearch()">Cek</button>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <p class="sidebar-label">Artikel lainnya</p>
+        <div id="relatedList">
+          <a class="related-item" href="/article.html?slug=cara-hemat-belanja">
+            <div class="related-thumb">💡</div>
+            <div><p class="related-title">5 Cara Dapat Harga Termurah di Marketplace</p><p class="related-meta">Tips Belanja · 4 mnt</p></div>
+          </a>
+          <a class="related-item" href="/article.html?slug=hp-terbaik-3-juta">
+            <div class="related-thumb">📱</div>
+            <div><p class="related-title">HP Terbaik di Bawah 3 Juta 2026</p><p class="related-meta">Review · 7 mnt</p></div>
+          </a>
+          <a class="related-item" href="/article.html?slug=tokopedia-vs-shopee">
+            <div class="related-thumb">🛒</div>
+            <div><p class="related-title">Tokopedia vs Shopee vs Lazada: Mana Paling Murah?</p><p class="related-meta">Panduan · 5 mnt</p></div>
+          </a>
+          <a class="related-item" href="/article.html?slug=laptop-gaming-kapan-beli">
+            <div class="related-thumb">🎮</div>
+            <div><p class="related-title">Kapan Waktu Terbaik Beli Laptop Gaming?</p><p class="related-meta">Promo · 5 mnt</p></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="disclaimer-box">
+        <p>⚠️ <strong>Disclaimer:</strong> Beberapa link di artikel ini adalah link afiliasi. Kami mendapat komisi kecil tanpa biaya tambahan dari kamu.</p>
+      </div>
+    </aside>
+
+  </div><!-- /content-wrap -->
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="/" class="logo">CekDulu<sup>beta</sup></a>
+        <p>Platform perbandingan harga produk marketplace Indonesia. Gratis dan transparan.</p>
+      </div>
+      <div class="footer-links-grid">
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a href="/">Bandingkan harga</a>
+          <a href="/blog.html">Blog</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="#">Kebijakan privasi</a>
+          <a href="#">Syarat & ketentuan</a>
+          <a href="#">Disclosure afiliasi</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 CekDulu. Dibuat dengan ❤️ untuk konsumen Indonesia.</p>
+      <div class="footer-mkt">
+        <span class="shop-shopee">Shopee</span>
+        <span class="shop-tokopedia">Tokopedia</span>
+        <span class="shop-lazada">Lazada</span>
+        <span class="shop-bukalapak">Bukalapak</span>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /app -->
+
+<script>
+  // ── Search ────────────────────────────────────────────
+  document.getElementById('sideSearch').addEventListener('keypress', e => {
+    if (e.key === 'Enter') goSearch();
+  });
+  function goSearch() {
+    const q = document.getElementById('sideSearch').value.trim();
+    if (q) window.location.href = '/?q=' + encodeURIComponent(q);
+  }
+
+  // ── Article data (akan diganti fetch dari API nanti) ──
+  const articles = {
+    'cara-hemat-belanja': {
+      title: '5 Cara Dapat Harga Termurah di Marketplace Indonesia',
+      cat: 'Tips Belanja', catClass: 'cat-tips',
+      date: 'Maret 2026', readTime: '4 menit baca',
+      thumb: '💡',
+      tags: ['Tips Belanja', 'Marketplace', 'Hemat', 'Promo'],
+      body: `
+        <p>Belanja online memang sudah jadi kebiasaan banyak orang Indonesia. Tapi, tahukah kamu bahwa harga produk yang sama bisa berbeda puluhan hingga ratusan ribu rupiah antara satu marketplace dan lainnya?</p>
+        <p>Di artikel ini, kami rangkum <strong>5 cara paling efektif</strong> untuk selalu dapat harga terbaik setiap kali belanja online.</p>
+
+        <div class="inline-cta">
+          <div><p>Mau cek harga sekarang?<small>Bandingkan Tokopedia, Shopee, Lazada & Bukalapak sekaligus</small></p></div>
+          <a href="/" class="cta-btn">Cek Harga →</a>
+        </div>
+
+        <h2>1. Bandingkan harga di beberapa marketplace</h2>
+        <p>Ini langkah paling mendasar tapi sering dilewatkan. Banyak orang langsung checkout di marketplace favorit mereka tanpa cek tempat lain. Padahal, selisih harganya bisa signifikan — terutama untuk produk elektronik dan gadget.</p>
+        <p>Cara termudah? Pakai <a href="/">CekDulu</a> untuk cek harga di Tokopedia, Shopee, Lazada, dan Bukalapak sekaligus dalam satu pencarian.</p>
+
+        <h2>2. Manfaatkan voucher dan kode promo</h2>
+        <p>Setiap marketplace punya sistem voucher masing-masing. Sebelum checkout, selalu cek dulu apakah ada voucher yang bisa dipakai — baik voucher toko, voucher marketplace, maupun cashback dari metode pembayaran.</p>
+        <ul>
+          <li><strong>Shopee:</strong> Cek tab "Voucher Saya" dan aktifkan coin Shopee</li>
+          <li><strong>Tokopedia:</strong> Gunakan GoPay atau OVO untuk cashback tambahan</li>
+          <li><strong>Lazada:</strong> Subscribe ke newsletter untuk dapat voucher eksklusif</li>
+          <li><strong>Bukalapak:</strong> Aktifkan BukaBantuan untuk promo spesial</li>
+        </ul>
+
+        <div class="tip-box">
+          <p class="tip-label">💡 Pro tip</p>
+          <p>Gabungkan voucher toko + voucher marketplace + cashback metode pembayaran. Dalam kondisi ideal, kamu bisa hemat hingga 30-40% dari harga normal.</p>
+        </div>
+
+        <h2>3. Beli saat flash sale atau tanggal cantik</h2>
+        <p>Marketplace besar selalu mengadakan flash sale rutin — biasanya jam 00.00, 12.00, dan 19.00. Selain itu, tanggal cantik seperti 11.11, 12.12, dan Harbolnas adalah momen terbaik untuk beli produk mahal seperti elektronik, furnitur, dan peralatan rumah tangga.</p>
+
+        <ul class="steps-list">
+          <li><span class="step-n">1</span>Pantau watchlist produk kamu 1-2 minggu sebelum tanggal cantik</li>
+          <li><span class="step-n">2</span>Screenshot harga normal sebagai patokan</li>
+          <li><span class="step-n">3</span>Beli saat flash sale dimulai — stok biasanya terbatas</li>
+          <li><span class="step-n">4</span>Jangan lupa pakai voucher di atas untuk hemat lebih banyak</li>
+        </ul>
+
+        <h2>4. Perhatikan ongkos kirim</h2>
+        <p>Harga produk murah bisa jadi mahal kalau ongkos kirimnya besar. Selalu hitung <strong>harga total termasuk ongkir</strong> sebelum memutuskan beli di marketplace mana. Beberapa tips:</p>
+        <ul>
+          <li>Cari produk dengan promo "Gratis Ongkir" atau "Bebas Ongkir"</li>
+          <li>Gabungkan pembelian dari satu toko agar dapat gratis ongkir minimum belanja</li>
+          <li>Gunakan ShopeePay/GoPay yang sering memberikan subsidi ongkir tambahan</li>
+        </ul>
+
+        <h2>5. Cek rating toko dan ulasan pembeli</h2>
+        <p>Harga murah tidak selalu berarti deal terbaik. Pastikan kamu beli dari toko dengan rating tinggi dan banyak ulasan positif. Produk dari toko terpercaya lebih kecil risikonya kena penipuan atau barang tidak sesuai deskripsi.</p>
+
+        <div class="warn-box">
+          <p>⚠️ <strong>Hati-hati:</strong> Harga yang terlalu murah jauh di bawah pasaran biasanya adalah tanda barang palsu atau penipuan. Selalu cek apakah toko punya badge "Official Store" atau rating di atas 4.7.</p>
+        </div>
+
+        <hr />
+        <p>Dengan menerapkan kelima cara di atas secara konsisten, kamu bisa menghemat jutaan rupiah per tahun dari belanja online. Mulai dari yang paling simpel: selalu bandingkan harga sebelum beli!</p>
+      `
+    },
+
+    'tokopedia-vs-shopee': {
+      title: 'Tokopedia vs Shopee vs Lazada: Mana yang Paling Murah?',
+      cat: 'Panduan', catClass: 'cat-panduan',
+      date: 'Maret 2026', readTime: '5 menit baca',
+      thumb: '🛒',
+      tags: ['Tokopedia', 'Shopee', 'Lazada', 'Perbandingan'],
+      body: `
+        <p>Pertanyaan ini pasti pernah muncul: <strong>kalau mau belanja, lebih murah di mana?</strong> Tokopedia? Shopee? Lazada? Atau Bukalapak?</p>
+        <p>Jawabannya: <em>tergantung produknya</em>. Tapi ada pola umum yang bisa jadi panduan kamu.</p>
+
+        <div class="inline-cta">
+          <div><p>Cek harga di semua marketplace sekaligus<small>Gratis, real-time, tanpa registrasi</small></p></div>
+          <a href="/" class="cta-btn">Bandingkan →</a>
+        </div>
+
+        <h2>Shopee: Raja promo dan cashback</h2>
+        <p>Shopee unggul dalam hal promosi dan cashback. Sistem coin, voucher berlapis, dan subsidi ongkir dari Shopee sering membuat harga akhir lebih murah meski harga listing-nya sama atau bahkan lebih tinggi.</p>
+        <ul>
+          <li>Terbaik untuk: fashion, kebutuhan rumah, produk kecantikan</li>
+          <li>Keunggulan: banyak promo, sistem coin, gratis ongkir mudah dapat</li>
+          <li>Kekurangan: butuh waktu untuk hunting voucher yang tepat</li>
+        </ul>
+
+        <h2>Tokopedia: Terpercaya untuk elektronik</h2>
+        <p>Tokopedia punya ekosistem perlindungan pembeli yang kuat dan banyak Official Store brand ternama. Untuk elektronik dan gadget, Tokopedia sering jadi pilihan karena garansi resmi lebih terjamin.</p>
+        <ul>
+          <li>Terbaik untuk: elektronik, gadget, produk bermerek</li>
+          <li>Keunggulan: Official Store banyak, proteksi pembeli baik</li>
+          <li>Kekurangan: harga kadang lebih mahal dari Shopee tanpa promo</li>
+        </ul>
+
+        <h2>Lazada: Pilihan untuk produk impor</h2>
+        <p>Lazada punya jaringan seller internasional yang kuat, membuatnya menjadi pilihan menarik untuk produk impor atau brand luar negeri yang belum banyak tersedia di marketplace lain.</p>
+
+        <hr />
+        <p>Kesimpulannya: tidak ada satu marketplace yang selalu paling murah untuk semua produk. Cara terbaik adalah <strong>bandingkan harga di semua marketplace sebelum beli</strong> — dan itulah yang CekDulu lakukan untuk kamu.</p>
+      `
+    },
+
+    'hp-terbaik-3-juta': {
+      title: 'HP Terbaik di Bawah 3 Juta: Rekomendasi 2026',
+      cat: 'Review', catClass: 'cat-review',
+      date: 'Maret 2026', readTime: '7 menit baca',
+      thumb: '📱',
+      tags: ['Smartphone', 'Rekomendasi', 'Budget', '2026'],
+      body: `
+        <p>Dengan budget 3 juta rupiah, kamu bisa dapat smartphone dengan spesifikasi yang cukup mumpuni untuk kebutuhan sehari-hari. Berikut rekomendasi terbaik kami untuk 2026.</p>
+
+        <div class="inline-cta">
+          <div><p>Cek harga HP pilihan kamu<small>Bandingkan harga di Tokopedia, Shopee, Lazada & Bukalapak</small></p></div>
+          <a href="/" class="cta-btn">Cek Harga →</a>
+        </div>
+
+        <h2>1. Xiaomi Redmi Note 13 Pro</h2>
+        <p>Pilihan terbaik di kelasnya. Layar AMOLED 120Hz, kamera 200MP, dan baterai 5000mAh dengan fast charging 67W menjadikannya pilihan sulit untuk ditolak di harga sekitar Rp 2,8 juta.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">✓ Rekomendasi Editor</p>
+          <p>Xiaomi Redmi Note 13 Pro menawarkan value terbaik di kelasnya untuk 2026. Kamera dan layarnya jauh di atas ekspektasi harga.</p>
+        </div>
+
+        <h2>2. Samsung Galaxy A35</h2>
+        <p>Untuk kamu yang prioritaskan ekosistem Samsung dan update software jangka panjang, Galaxy A35 adalah pilihan solid. Samsung menjanjikan 4 tahun OS update untuk seri ini.</p>
+
+        <h2>3. POCO X6</h2>
+        <p>Pilihan terbaik untuk gaming. Chipset Snapdragon 7s Gen 2 memberikan performa gaming yang kencang untuk harganya, ditunjang layar AMOLED 120Hz yang responsif.</p>
+
+        <hr />
+        <p>Ketiga HP di atas bisa kamu temukan di semua marketplace besar Indonesia. Harga bisa berbeda antar marketplace, jadi selalu cek dan bandingkan sebelum beli!</p>
+      `
+    },
+
+    'laptop-gaming-kapan-beli': {
+      title: 'Kapan Waktu Terbaik Beli Laptop Gaming?',
+      cat: 'Promo', catClass: 'cat-promo',
+      date: 'Februari 2026', readTime: '5 menit baca',
+      thumb: '🎮',
+      tags: ['Laptop Gaming', 'Promo', 'Harbolnas', 'Tips'],
+      body: `
+        <p>Laptop gaming adalah salah satu pembelian terbesar yang sering dilakukan gamer Indonesia. Timing pembelian bisa membuat perbedaan jutaan rupiah.</p>
+
+        <div class="inline-cta">
+          <div><p>Pantau harga laptop gaming pilihanmu<small>Cek harga real-time di semua marketplace</small></p></div>
+          <a href="/" class="cta-btn">Cek Harga →</a>
+        </div>
+
+        <h2>Harbolnas & Tanggal Cantik</h2>
+        <p>Ini waktu terbaik untuk beli laptop gaming. Diskon bisa mencapai 20-30% bahkan lebih, terutama untuk model yang sudah berumur 6-12 bulan. Tanggal yang perlu dipantau: 11.11, 12.12, dan pertengahan tahun (6.6, 7.7).</p>
+
+        <h2>Akhir Tahun Ajaran (Mei-Juli)</h2>
+        <p>Brand laptop sering mengadakan promo "Back to School" menjelang tahun ajaran baru. Ini juga saat model baru biasanya diluncurkan, yang berarti harga model lama turun signifikan.</p>
+
+        <h2>Peluncuran GPU Baru</h2>
+        <p>Setiap kali NVIDIA atau AMD meluncurkan seri GPU baru, harga laptop dengan GPU generasi sebelumnya biasanya turun 10-20%. Pantau berita teknologi untuk tahu kapan ini terjadi.</p>
+
+        <div class="warn-box">
+          <p>⚠️ Jangan beli laptop gaming tepat setelah diluncurkan. Tunggu 2-3 bulan untuk harga stabil dan review independen bermunculan.</p>
+        </div>
+
+        <hr />
+        <p>Intinya: sabar adalah kunci. Pantau harga secara rutin, dan beli di momen promo besar. Selisihnya bisa jutaan rupiah untuk produk yang sama persis.</p>
+      `
+    }
+  };
+
+  // ── Load article from URL slug ────────────────────────
+  function loadArticle() {
+    const slug = new URLSearchParams(window.location.search).get('slug') || 'cara-hemat-belanja';
+    const article = articles[slug] || articles['cara-hemat-belanja'];
+
+    document.getElementById('pageTitle').textContent = article.title + ' – CekDulu';
+    document.getElementById('pageDesc').setAttribute('content', article.title + '. Tips belanja cerdas dari CekDulu.');
+    document.getElementById('breadcrumbTitle').textContent = article.title.length > 40 ? article.title.slice(0, 40) + '…' : article.title;
+    document.getElementById('articleTitle').textContent = article.title;
+    document.getElementById('articleCat').textContent = article.cat;
+    document.getElementById('articleCat').className = 'article-cat ' + article.catClass;
+    document.getElementById('articleDate').textContent = article.date;
+    document.getElementById('articleReadTime').textContent = article.readTime;
+    document.getElementById('articleThumb').textContent = article.thumb;
+    document.getElementById('articleBody').innerHTML = article.body;
+    document.getElementById('articleTags').innerHTML =
+      article.tags.map(t => `<span class="tag">${t}</span>`).join('');
+  }
+
+  loadArticle();
+</script>
+</body>
+</html>
