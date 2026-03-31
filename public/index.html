@@ -204,7 +204,8 @@
     .product-img { width: 100%; height: 110px; background: #F1EFE8; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 32px; border: 1px solid #E8E6DF; overflow: hidden; }
     .product-img img { width: 100%; height: 100%; object-fit: contain; }
     .product-name { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 6px; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .shop-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 6px; margin-bottom: 8px; }
+    .shop-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; padding: 3px 9px 3px 6px; border-radius: 6px; margin-bottom: 8px; }
+    .shop-badge img { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
     .shop-shopee     { background: #F5C4B3; color: #993C1D; }
     .shop-tokopedia  { background: #9FE1CB; color: #085041; }
     .shop-lazada     { background: #B5D4F4; color: #0C447C; }
@@ -471,10 +472,10 @@
       <div class="footer-bottom">
         <p>© 2026 CekDulu. Dibuat dengan ❤️ untuk konsumen Indonesia.</p>
         <div class="footer-mkt">
-          <span class="shop-badge shop-shopee">Shopee</span>
-          <span class="shop-badge shop-tokopedia">Tokopedia</span>
-          <span class="shop-badge shop-lazada">Lazada</span>
-          <span class="shop-badge shop-bukalapak">Bukalapak</span>
+          <span class="shop-badge shop-shopee"><img src="https://www.google.com/s2/favicons?domain=shopee.co.id&sz=32" width="14" height="14">Shopee</span>
+          <span class="shop-badge shop-tokopedia"><img src="https://www.google.com/s2/favicons?domain=tokopedia.com&sz=32" width="14" height="14">Tokopedia</span>
+          <span class="shop-badge shop-lazada"><img src="https://www.google.com/s2/favicons?domain=lazada.co.id&sz=32" width="14" height="14">Lazada</span>
+          <span class="shop-badge shop-bukalapak"><img src="https://www.google.com/s2/favicons?domain=bukalapak.com&sz=32" width="14" height="14">Bukalapak</span>
         </div>
       </div>
     </footer>
@@ -524,11 +525,11 @@
 
       <!-- Marketplace filters -->
       <div class="filters">
-        <button class="filter-btn active" onclick="filterMkt('all',this)"><span class="mkt-dot" style="background:#888"></span> Semua</button>
-        <button class="filter-btn" onclick="filterMkt('shopee',this)"><span class="mkt-dot" style="background:#D85A30"></span> Shopee</button>
-        <button class="filter-btn" onclick="filterMkt('tokopedia',this)"><span class="mkt-dot" style="background:#0F6E56"></span> Tokopedia</button>
-        <button class="filter-btn" onclick="filterMkt('lazada',this)"><span class="mkt-dot" style="background:#185FA5"></span> Lazada</button>
-        <button class="filter-btn" onclick="filterMkt('bukalapak',this)"><span class="mkt-dot" style="background:#A32D2D"></span> Bukalapak</button>
+        <button class="filter-btn active" onclick="filterMkt('all',this)">Semua</button>
+        <button class="filter-btn" onclick="filterMkt('shopee',this)"><img src="https://www.google.com/s2/favicons?domain=shopee.co.id&sz=32" width="14" height="14" style="border-radius:3px"> Shopee</button>
+        <button class="filter-btn" onclick="filterMkt('tokopedia',this)"><img src="https://www.google.com/s2/favicons?domain=tokopedia.com&sz=32" width="14" height="14" style="border-radius:3px"> Tokopedia</button>
+        <button class="filter-btn" onclick="filterMkt('lazada',this)"><img src="https://www.google.com/s2/favicons?domain=lazada.co.id&sz=32" width="14" height="14" style="border-radius:3px"> Lazada</button>
+        <button class="filter-btn" onclick="filterMkt('bukalapak',this)"><img src="https://www.google.com/s2/favicons?domain=bukalapak.com&sz=32" width="14" height="14" style="border-radius:3px"> Bukalapak</button>
       </div>
 
       <p class="slabel">Hasil pencarian</p>
@@ -576,6 +577,12 @@
 
 <script>
   const API_BASE = ''; // kosong = Railway server yang sama
+  const mpLogo = {
+    tokopedia: 'https://www.google.com/s2/favicons?domain=tokopedia.com&sz=32',
+    shopee:    'https://www.google.com/s2/favicons?domain=shopee.co.id&sz=32',
+    lazada:    'https://www.google.com/s2/favicons?domain=lazada.co.id&sz=32',
+    bukalapak: 'https://www.google.com/s2/favicons?domain=bukalapak.com&sz=32',
+  };
   let allResults = [];
   let currentFilter = 'all';
   let comparingItem = null;
@@ -781,7 +788,7 @@
         ${isBest ? '<span class="badge badge-deal">Harga terbaik</span>' : '<span class="badge badge-listed">Tersedia</span>'}
         ${thumb}
         <p class="product-name">${p.name}</p>
-        <span class="shop-badge shop-${mp}">${name}</span>
+        <span class="shop-badge shop-${mp}"><img src="${mpLogo[mp]}" alt="${name}">${name}</span>
         ${priceHTML}
         ${starsHTML}
         ${noteHTML}
@@ -805,7 +812,7 @@
     const mpNames = { tokopedia: 'Tokopedia', shopee: 'Shopee', lazada: 'Lazada', bukalapak: 'Bukalapak' };
     document.getElementById('compareBody').innerHTML = sorted.map((p, i) => `
       <tr>
-        <td><span class="shop-badge shop-${p.marketplace}">${mpNames[p.marketplace] || p.marketplace}</span></td>
+        <td><span class="shop-badge shop-${p.marketplace}"><img src="${mpLogo[p.marketplace]}" alt="${mpNames[p.marketplace]}">${mpNames[p.marketplace] || p.marketplace}</span></td>
         <td style="max-width:200px;color:var(--muted);font-size:12px;font-weight:500">${p.name}</td>
         <td class="${i === 0 && p.priceNum > 0 ? 'best-price-cell' : ''}">${p.price}${i === 0 && p.priceNum > 0 ? ' ✓' : ''}</td>
         <td style="font-weight:600">${p.rating && p.rating !== '-' ? p.rating + ' ★' : '—'}</td>
@@ -858,7 +865,7 @@
     document.getElementById('modalBody').innerHTML = `<div class="side-by-side">${[p1, p2].map((p, idx) => `
       <div class="compare-col">
         <div class="product-img" style="height:80px;margin-bottom:10px">${mpEmoji[p.marketplace] || '🛒'}</div>
-        <span class="shop-badge shop-${p.marketplace}" style="margin-bottom:8px;display:inline-block">${mpNames[p.marketplace] || p.marketplace}</span>
+        <span class="shop-badge shop-${p.marketplace}" style="margin-bottom:8px"><img src="${mpLogo[p.marketplace]}" alt="${mpNames[p.marketplace]}">${mpNames[p.marketplace] || p.marketplace}</span>
         <h3>${p.name}</h3>
         <div class="compare-row-m"><span class="mlabel">Harga</span><span class="mval ${idx === ch ? 'winner' : ''}">${p.price}${idx === ch ? ' 🏆' : ''}</span></div>
         <div class="compare-row-m"><span class="mlabel">Rating</span><span class="mval">${p.rating !== '-' ? p.rating + ' ★' : '—'}</span></div>
