@@ -343,6 +343,45 @@ app.get('/search', async (req, res) => {
 });
 
 // ============================================================
+// YOUTUBE — search video review per produk
+// Set YOUTUBE_API_KEY in Railway Variables
+// ============================================================
+const youtubeCache = new Map(); // key: query, value: { data, expiry }
+const YOUTUBE_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 jam
+
+app.get('/youtube', async (req, res) => {
+  const query = req.query.q;
+  if (!query?.trim()) return res.status(400).json({ error: 'Parameter q wajib diisi' });
+  if (!process.env.YOUTUBE_API_KEY) return res.json({ videos: [], note: 'YOUTUBE_API_KEY not set' });
+
+  const cacheKey = query.toLowerCase().trim();
+  const cached = youtubeCache.get(cacheKey);
+  if (cached && cached.expiry > Date.now()) {
+    return res.json({ videos: cached.data, cached: true });
+  }
+
+  try {
+    const searchQuery = encodeURIComponent(`${query} review`);
+    const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${searchQuery}&type=video&maxResults=4&relevanceLanguage=id&key=${process.env.YOUTUBE_API_KEY}`;
+    const response = await axios.get(apiUrl, { timeout: 5000 });
+    const videos = (response.data.items || []).map(item => ({
+      id:        item.id.videoId,
+      title:     item.snippet.title,
+      channel:   item.snippet.channelTitle,
+      thumb:     item.snippet.thumbnails?.medium?.url || `https://img.youtube.com/vi/${item.id.videoId}/mqdefault.jpg`,
+      url:       `https://www.youtube.com/watch?v=${item.id.videoId}`,
+      published: item.snippet.publishedAt?.split('T')[0] || '',
+    }));
+
+    youtubeCache.set(cacheKey, { data: videos, expiry: Date.now() + YOUTUBE_CACHE_TTL });
+    res.json({ videos });
+  } catch (err) {
+    console.error('[CekDulu] YouTube API error:', err.message);
+    res.json({ videos: [], error: 'YouTube fetch failed' });
+  }
+});
+
+// ============================================================
 // SEO — robots.txt & sitemap.xml
 // Set SITE_URL in Railway Variables, e.g. https://cekdulu.id
 // ============================================================
