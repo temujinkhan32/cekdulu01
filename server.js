@@ -361,20 +361,44 @@ app.get('/youtube', async (req, res) => {
   }
 
   try {
-    const searchQuery = encodeURIComponent(`${query} review`);
-    const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${searchQuery}&type=video&maxResults=4&relevanceLanguage=id&key=${process.env.YOUTUBE_API_KEY}`;
-    const response = await axios.get(apiUrl, { timeout: 5000 });
-    const videos = (response.data.items || []).map(item => ({
+    const key = process.env.YOUTUBE_API_KEY;
+    const toVideo = item => ({
       id:        item.id.videoId,
       title:     item.snippet.title,
       channel:   item.snippet.channelTitle,
       thumb:     item.snippet.thumbnails?.medium?.url || `https://img.youtube.com/vi/${item.id.videoId}/mqdefault.jpg`,
       url:       `https://www.youtube.com/watch?v=${item.id.videoId}`,
       published: item.snippet.publishedAt?.split('T')[0] || '',
-    }));
+    });
 
-    youtubeCache.set(cacheKey, { data: videos, expiry: Date.now() + YOUTUBE_CACHE_TTL });
-    res.json({ videos });
+    // Request 1 — konten Indonesia (tambah kata "indonesia" di query + regionCode ID)
+    const qID  = encodeURIComponent(`${query} review indonesia`);
+    const urlID = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${qID}&type=video&maxResults=3&regionCode=ID&relevanceLanguage=id&key=${key}`;
+
+    // Request 2 — review umum (Inggris/global)
+    const qEN  = encodeURIComponent(`${query} review`);
+    const urlEN = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${qEN}&type=video&maxResults=3&key=${key}`;
+
+    const [resID, resEN] = await Promise.all([
+      axios.get(urlID, { timeout: 5000 }).catch(() => ({ data: { items: [] } })),
+      axios.get(urlEN, { timeout: 5000 }).catch(() => ({ data: { items: [] } })),
+    ]);
+
+    const videosID = (resID.data.items || []).map(toVideo);
+    const videosEN = (resEN.data.items || []).map(toVideo);
+
+    // Gabungkan: prioritaskan Indo, tambah EN kalau belum ada (deduplikasi by id)
+    const seen = new Set();
+    const merged = [];
+    for (const v of [...videosID, ...videosEN]) {
+      if (!seen.has(v.id) && merged.length < 3) {
+        seen.add(v.id);
+        merged.push(v);
+      }
+    }
+
+    youtubeCache.set(cacheKey, { data: merged, expiry: Date.now() + YOUTUBE_CACHE_TTL });
+    res.json({ videos: merged });
   } catch (err) {
     console.error('[CekDulu] YouTube API error:', err.message);
     res.json({ videos: [], error: 'YouTube fetch failed' });
