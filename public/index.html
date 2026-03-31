@@ -768,7 +768,7 @@
 
     grid.innerHTML = filtered.map((p, i) => {
       const isBest = cheapestId && p === cheapestId;
-      const isSel  = comparingItem && comparingItem._idx === p._idx;
+      const isSel  = comparingItem && comparingItem._idx === i;
       const mp     = p.marketplace;
       const name   = mpNames[mp] || mp;
 
