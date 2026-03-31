@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog & Tips Belanja – CekDulu</title>
   <meta name="description" content="Tips belanja cerdas, rekomendasi produk terbaik, dan cara mendapatkan harga termurah di marketplace Indonesia." />
+  <!-- Google Analytics 4 + Consent default -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied' });
+    if (localStorage.getItem('cd_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2WNWKFBTQ"></script>
+  <script>
+    gtag('js', new Date());
+    gtag('config', 'G-Z2WNWKFBTQ');
+  </script>
 
   <!-- Schema Markup: Blog -->
   <script type="application/ld+json">
@@ -340,6 +354,28 @@
   }
 
   loadPosts();
+</script>
+<!-- Cookie Consent Banner -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1a18;color:#fff;padding:14px 24px;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between;box-shadow:0 -4px 20px rgba(0,0,0,.2)">
+  <p style="margin:0;font-size:13px;font-weight:500;flex:1;min-width:200px;line-height:1.5">🍪 CekDulu pakai cookies untuk analytics dan pengalaman yang lebih baik. <a href="/privacy-policy.html" style="color:#E8460A;text-decoration:underline">Kebijakan Privasi</a></p>
+  <div style="display:flex;gap:8px;flex-shrink:0">
+    <button onclick="declineCookies()" style="background:transparent;border:1.5px solid rgba(255,255,255,.3);color:#fff;border-radius:50px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">Tolak</button>
+    <button onclick="acceptCookies()" style="background:#E8460A;border:none;color:#fff;border-radius:50px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">Terima</button>
+  </div>
+</div>
+<script>
+  function acceptCookies() {
+    localStorage.setItem('cd_consent', 'granted');
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    document.getElementById('cookieBanner').style.display = 'none';
+  }
+  function declineCookies() {
+    localStorage.setItem('cd_consent', 'denied');
+    document.getElementById('cookieBanner').style.display = 'none';
+  }
+  if (!localStorage.getItem('cd_consent')) {
+    document.getElementById('cookieBanner').style.display = 'flex';
+  }
 </script>
 </body>
 </html>
