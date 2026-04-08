@@ -6,6 +6,62 @@ const path = require('path');
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// ============================================================
+// CATEGORY + PRODUCT — constants & helpers
+// ============================================================
+const DEFAULT_CATEGORIES = [
+  { slug:'headphone',  name:'Headphone & Earphone', desc:'Perbandingan harga headphone wireless, TWS, dan earphone dari semua marketplace.', keywords:'headphone,earphone,tws,earbuds,airpods,buds', thumb:'🎧', color:'blue' },
+  { slug:'laptop',     name:'Laptop & Notebook',    desc:'Laptop gaming, laptop kerja, dan ultrabook terbaru di semua marketplace.', keywords:'laptop,notebook,macbook,chromebook', thumb:'💻', color:'green' },
+  { slug:'smartphone', name:'Smartphone & HP',      desc:'HP Android, iPhone, dan smartphone terbaru di marketplace Indonesia.', keywords:'smartphone,handphone,iphone,xiaomi,samsung,oppo,vivo,realme,infinix', thumb:'📱', color:'orange' },
+  { slug:'kamera',     name:'Kamera & Foto',        desc:'Kamera mirrorless, DSLR, dan aksi kamera terbaik di semua marketplace.', keywords:'kamera,camera,mirrorless,dslr,gopro,fujifilm,canon,nikon', thumb:'📷', color:'red' },
+  { slug:'tv-monitor', name:'TV & Monitor',         desc:'Smart TV, monitor gaming, dan LED TV terbaru.', keywords:'smart tv,televisi,monitor,oled,qled,android tv', thumb:'📺', color:'purple' },
+  { slug:'gaming',     name:'Gaming & Konsol',      desc:'Konsol game dan aksesoris gaming terbaik.', keywords:'ps5,playstation,xbox,nintendo,controller,joystick,gamepad', thumb:'🎮', color:'yellow' },
+];
+
+function toSlug(text) {
+  return text.toLowerCase()
+    .replace(/[^\w\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-')
+    .trim().substring(0,100);
+}
+
+function detectCategory(query) {
+  const q = query.toLowerCase();
+  for (const cat of DEFAULT_CATEGORIES) {
+    if (cat.keywords.split(',').map(k=>k.trim()).filter(Boolean).some(kw => q.includes(kw))) return cat.slug;
+  }
+  return null;
+}
+
+async function saveProduct(query, results) {
+  if (!process.env.DATABASE_URL) return;
+  try {
+    const slug   = toSlug(query);
+    const priced = results.filter(r => r.priceNum > 0);
+    if (!priced.length) return;
+    const prices  = priced.map(r => r.priceNum);
+    const minP    = Math.min(...prices), maxP = Math.max(...prices);
+    const catSlug = detectCategory(query);
+    const bestName = priced[0]?.name || query;
+    const image   = results.find(r => r.image)?.image || null;
+    await pool.query(`
+      INSERT INTO products (slug, name, query, category_slug, search_count, last_min_price, last_max_price, image_url)
+      VALUES ($1,$2,$3,$4,1,$5,$6,$7)
+      ON CONFLICT (slug) DO UPDATE SET
+        search_count   = products.search_count + 1,
+        last_min_price = EXCLUDED.last_min_price,
+        last_max_price = EXCLUDED.last_max_price,
+        image_url      = COALESCE(EXCLUDED.image_url, products.image_url),
+        updated_at     = NOW()
+    `, [slug, bestName, query, catSlug, minP, maxP, image]);
+    for (const r of priced) {
+      pool.query(
+        `INSERT INTO product_prices (product_slug, marketplace, price, url) VALUES ($1,$2,$3,$4)`,
+        [slug, r.marketplace, r.priceNum, r.url]
+      ).catch(()=>{});
+    }
+  } catch(err) { console.error('[CekDulu] saveProduct:', err.message); }
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -42,6 +98,32 @@ async function initDB() {
         published   BOOLEAN      DEFAULT true,
         created_at  TIMESTAMP    DEFAULT NOW(),
         updated_at  TIMESTAMP    DEFAULT NOW()
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id             SERIAL PRIMARY KEY,
+        slug           VARCHAR(255) UNIQUE NOT NULL,
+        name           TEXT NOT NULL,
+        query          TEXT,
+        category_slug  VARCHAR(100),
+        search_count   INTEGER   DEFAULT 1,
+        last_min_price INTEGER   DEFAULT 0,
+        last_max_price INTEGER   DEFAULT 0,
+        image_url      TEXT,
+        noindex        BOOLEAN   DEFAULT false,
+        created_at     TIMESTAMP DEFAULT NOW(),
+        updated_at     TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS product_prices (
+        id            SERIAL PRIMARY KEY,
+        product_slug  VARCHAR(255),
+        marketplace   VARCHAR(50),
+        price         INTEGER,
+        url           TEXT,
+        scraped_at    TIMESTAMP DEFAULT NOW()
       )
     `);
     console.log('[CekDulu] Database ready ✓');
@@ -150,6 +232,54 @@ app.get('/trending', (req, res) => {
     .slice(0, limit)
     .map(([keyword, count]) => ({ keyword, count }));
   res.json({ trending, total_searches: keywordLog.length });
+});
+
+// ============================================================
+// CATEGORY + PRODUCT API
+// ============================================================
+
+// GET /api/kategori — semua kategori + jumlah produk
+app.get('/api/kategori', async (req, res) => {
+  if (!process.env.DATABASE_URL) return res.json({ categories: DEFAULT_CATEGORIES.map(c=>({...c,count:0})) });
+  try {
+    const cats = await Promise.all(DEFAULT_CATEGORIES.map(async cat => {
+      const { rows } = await pool.query(`SELECT COUNT(*) FROM products WHERE category_slug=$1`, [cat.slug]);
+      return { ...cat, count: parseInt(rows[0].count) };
+    }));
+    res.json({ categories: cats });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+// GET /api/kategori/:slug — produk dalam kategori
+app.get('/api/kategori/:slug', async (req, res) => {
+  const cat = DEFAULT_CATEGORIES.find(c => c.slug === req.params.slug);
+  if (!cat) return res.status(404).json({ error: 'Category not found' });
+  if (!process.env.DATABASE_URL) return res.json({ category: cat, products: [] });
+  try {
+    const { rows } = await pool.query(
+      `SELECT slug, name, query, search_count, last_min_price, last_max_price, image_url, updated_at
+       FROM products WHERE category_slug=$1 AND last_min_price > 0 AND noindex=false
+       ORDER BY search_count DESC, updated_at DESC LIMIT 48`,
+      [req.params.slug]
+    );
+    res.json({ category: cat, products: rows });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+// GET /api/produk/:slug — detail produk + price history 30 hari
+app.get('/api/produk/:slug', async (req, res) => {
+  if (!process.env.DATABASE_URL) return res.status(404).json({ error: 'Database not configured' });
+  try {
+    const { rows } = await pool.query(`SELECT * FROM products WHERE slug=$1`, [req.params.slug]);
+    if (!rows.length) return res.status(404).json({ error: 'Product not found' });
+    const { rows: history } = await pool.query(
+      `SELECT marketplace, price, DATE(scraped_at) as date
+       FROM product_prices WHERE product_slug=$1 AND scraped_at > NOW() - INTERVAL '30 days'
+       ORDER BY scraped_at ASC`,
+      [req.params.slug]
+    );
+    res.json({ product: rows[0], price_history: history });
+  } catch(err) { res.status(500).json({ error: err.message }); }
 });
 
 // ============================================================
@@ -336,6 +466,7 @@ app.get('/search', async (req, res) => {
       { name:`${query} - Lazada`, price:'Cek di Lazada', priceNum:0, marketplace:'lazada', url:buildAffiliateLink('lazada',`https://www.lazada.co.id/catalog/?q=${encodeURIComponent(query)}`), rating:'-', reviews:'-', image:null, note:'Klik untuk lihat harga terbaru' },
     ];
     allResults.sort((a,b)=>{ if(a.priceNum>0&&b.priceNum===0)return -1; if(a.priceNum===0&&b.priceNum>0)return 1; return a.priceNum-b.priceNum; });
+    saveProduct(query, allResults); // fire and forget — builds product + price history DB
     res.json({ query, total:allResults.length, timestamp:new Date().toISOString(), disclaimer:'Harga dapat berubah. Semua link adalah link afiliasi.', results:allResults });
   } catch (err) {
     res.status(500).json({ error: 'Terjadi kesalahan', message: err.message });
@@ -406,6 +537,15 @@ app.get('/youtube', async (req, res) => {
 });
 
 // ============================================================
+// CLEAN URL ROUTES — serve HTML for category / product pages
+// Express.static sudah handle /kategori.html, /produk.html
+// Route ini handle URL bersih: /kategori/headphone, /produk/sony-wh1000xm5
+// ============================================================
+app.get('/kategori',       (req, res) => res.sendFile(path.join(__dirname, 'public', 'kategori.html')));
+app.get('/kategori/:slug', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kategori.html')));
+app.get('/produk/:slug',   (req, res) => res.sendFile(path.join(__dirname, 'public', 'produk.html')));
+
+// ============================================================
 // SEO — robots.txt & sitemap.xml
 // Set SITE_URL in Railway Variables, e.g. https://cekdulu.id
 // ============================================================
@@ -428,8 +568,9 @@ app.get('/sitemap.xml', async (req, res) => {
 
   // Static pages
   const staticPages = [
-    { loc: `${baseUrl}/`,          priority: '1.0', changefreq: 'daily'   },
-    { loc: `${baseUrl}/blog.html`, priority: '0.9', changefreq: 'daily'   },
+    { loc: `${baseUrl}/`,          priority: '1.0', changefreq: 'daily'  },
+    { loc: `${baseUrl}/blog.html`, priority: '0.9', changefreq: 'daily'  },
+    { loc: `${baseUrl}/kategori`,  priority: '0.8', changefreq: 'weekly' },
   ];
 
   // Dynamic posts from DB
@@ -450,7 +591,27 @@ app.get('/sitemap.xml', async (req, res) => {
     }
   }
 
-  const allPages = [...staticPages, ...dynamicPages];
+  // Category pages
+  const catPages = DEFAULT_CATEGORIES.map(cat => ({
+    loc: `${baseUrl}/kategori/${cat.slug}`, priority: '0.8', changefreq: 'daily',
+  }));
+
+  // Product pages (top searched, indexed)
+  let productPages = [];
+  if (process.env.DATABASE_URL) {
+    try {
+      const { rows } = await pool.query(
+        `SELECT slug, updated_at FROM products WHERE last_min_price > 0 AND noindex=false ORDER BY search_count DESC LIMIT 200`
+      );
+      productPages = rows.map(p => ({
+        loc: `${baseUrl}/produk/${p.slug}`,
+        lastmod: p.updated_at?.toISOString().split('T')[0] || today,
+        priority: '0.7', changefreq: 'daily',
+      }));
+    } catch(e) {}
+  }
+
+  const allPages = [...staticPages, ...dynamicPages, ...catPages, ...productPages];
 
   const urlEntries = allPages.map(p => `
   <url>
