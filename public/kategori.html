@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Kategori Produk – CekDulu</title>
+  <meta id="pageDesc" name="description" content="Bandingkan harga produk dari semua marketplace Indonesia. Pilih kategori dan cek harga terbaik sekarang." />
+  <link rel="canonical" id="canonicalTag" href="https://cekdulu.id/kategori" />
+
+  <!-- GA4 + Consent -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+    if (localStorage.getItem('cd_consent')==='granted') gtag('consent','update',{analytics_storage:'granted'});
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2WNWKFBTQ"></script>
+  <script>gtag('js',new Date());gtag('config','G-Z2WNWKFBTQ');</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --accent:#E8460A;--accent2:#1D9E75;--bg:#F5F3EE;--card:#fff;
+      --text:#1a1a18;--muted:#6B6A65;--border:rgba(0,0,0,.12);
+      --line:#D3D1C7;--radius:14px;
+    }
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .app{max-width:960px;margin:0 auto;padding:0 1rem}
+
+    /* NAV */
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0;border-bottom:1px solid var(--border);margin-bottom:2.5rem}
+    .logo{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--accent);text-decoration:none}
+    .logo sup{font-size:10px;font-weight:500;color:var(--muted);margin-left:2px;vertical-align:super}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{font-size:13px;color:var(--muted);text-decoration:none;font-weight:600;transition:color .15s}
+    .nav-links a:hover{color:var(--text)}
+    .nav-badge{background:#FAECE7;color:#D85A30;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:700;border:1px solid #F5C4B3}
+
+    /* HERO */
+    .page-hero{padding:2rem 0 2.5rem}
+    .page-hero .eyebrow{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:.75rem}
+    .page-hero h1{font-size:clamp(24px,4vw,36px);font-weight:700;letter-spacing:-1px;line-height:1.15;margin-bottom:.6rem}
+    .page-hero h1 em{color:var(--accent);font-style:normal}
+    .page-hero p{font-size:14px;color:var(--muted);max-width:500px;line-height:1.7}
+
+    /* BREADCRUMB */
+    .breadcrumb{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-bottom:1.5rem;flex-wrap:wrap}
+    .breadcrumb a{color:var(--muted);text-decoration:none;font-weight:500}
+    .breadcrumb a:hover{color:var(--text)}
+    .breadcrumb span{color:#B4B2A9}
+
+    /* ALL CATEGORIES GRID */
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;margin-bottom:3rem}
+    .cat-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:1.5rem;display:flex;align-items:flex-start;gap:1rem;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit}
+    .cat-card:hover{border-color:#888780;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.09)}
+    .cat-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+    .icon-blue  {background:#EBF4FD}
+    .icon-green {background:#EDFBF5}
+    .icon-orange{background:#FEF3EC}
+    .icon-red   {background:#FDF0EE}
+    .icon-purple{background:#F3EEFB}
+    .icon-yellow{background:#FEFBEC}
+    .cat-info{}
+    .cat-name{font-size:15px;font-weight:700;margin-bottom:4px}
+    .cat-desc{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:8px}
+    .cat-count{font-size:11px;font-weight:700;color:var(--accent)}
+
+    /* SINGLE CATEGORY — product grid */
+    .cat-header{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.75rem;display:flex;align-items:center;gap:1.25rem}
+    .cat-header-icon{width:60px;height:60px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+    .cat-header h1{font-size:22px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px}
+    .cat-header p{font-size:13px;color:var(--muted);line-height:1.6}
+
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2.5rem}
+    .prod-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+    .prod-card:hover{border-color:#888780;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.09)}
+    .prod-thumb{height:110px;background:#F1EFE8;display:flex;align-items:center;justify-content:center;font-size:36px;border-bottom:1px solid #E8E6DF;overflow:hidden}
+    .prod-thumb img{width:100%;height:100%;object-fit:cover}
+    .prod-body{padding:.875rem;flex:1;display:flex;flex-direction:column}
+    .prod-name{font-size:13px;font-weight:700;line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+    .prod-price{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:4px}
+    .prod-meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+    .prod-search-count{font-size:10px;background:#F1EFE8;color:var(--muted);padding:2px 7px;border-radius:20px;font-weight:600}
+
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:4rem 1rem;color:var(--muted)}
+    .empty-state .emoji{font-size:48px;margin-bottom:1rem}
+    .empty-state h3{font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text)}
+    .empty-state p{font-size:13px;line-height:1.7;margin-bottom:1.5rem}
+    .empty-search{display:flex;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:50px;padding:6px 6px 6px 20px;gap:8px;max-width:420px;margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+    .empty-search:focus-within{border-color:var(--accent)}
+    .empty-search input{flex:1;border:none;outline:none;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:transparent;color:var(--text)}
+    .empty-search input::placeholder{color:#B4B2A9}
+    .empty-search button{background:var(--accent);color:#fff;border:none;border-radius:50px;padding:9px 20px;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer}
+
+    /* LOADING */
+    .loading{text-align:center;padding:3rem;color:var(--muted);font-size:13px;font-weight:500}
+    .loading .dots::after{content:'...';animation:dots 1.2s infinite}
+    @keyframes dots{0%,20%{content:'.'} 40%{content:'..'} 60%,100%{content:'...'}}
+
+    /* CTA */
+    .cta-banner{background:linear-gradient(135deg,#04342C,#0F6E56);border-radius:var(--radius);padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:2.5rem 0}
+    .cta-left h3{font-size:17px;font-weight:700;color:#fff;margin-bottom:4px}
+    .cta-left p{font-size:13px;color:rgba(255,255,255,.75);line-height:1.6;max-width:400px}
+    .cta-btn{background:#fff;color:#04342C;border:none;border-radius:50px;padding:11px 24px;font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block;transition:opacity .2s}
+    .cta-btn:hover{opacity:.88}
+
+    /* OTHER CATEGORIES */
+    .section-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:1rem}
+    .other-cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2.5rem}
+    .other-cat-pill{display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:50px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;color:var(--text);transition:all .2s}
+    .other-cat-pill:hover{border-color:#888780;background:#F1EFE8}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);margin-top:1rem;padding:1.5rem 0 2rem}
+    .footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+    .footer-brand p{font-size:12px;color:var(--muted);margin-top:6px;max-width:220px;line-height:1.6}
+    .footer-links-grid{display:flex;gap:2rem;flex-wrap:wrap}
+    .footer-col h4{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px}
+    .footer-col a{display:block;font-size:12px;color:var(--muted);text-decoration:none;margin-bottom:6px;font-weight:500;transition:color .15s}
+    .footer-col a:hover{color:var(--text)}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding-top:1rem;border-top:1px solid var(--border)}
+    .footer-bottom p{font-size:11px;color:var(--muted);font-weight:500}
+    .footer-mkt{display:flex;gap:6px;flex-wrap:wrap}
+    .footer-mkt span{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+    .shop-shopee{background:#F5C4B3;color:#993C1D}
+    .shop-tokopedia{background:#9FE1CB;color:#085041}
+    .shop-lazada{background:#B5D4F4;color:#0C447C}
+    .shop-bukalapak{background:#F7C1C1;color:#791F1F}
+
+    @media(max-width:600px){.cat-grid{grid-template-columns:1fr}.product-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:400px){.product-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <nav>
+    <a href="/" class="logo">CekDulu<sup>beta</sup></a>
+    <div class="nav-links">
+      <a href="/">🔍 Bandingkan harga</a>
+      <a href="/blog.html">📝 Blog</a>
+      <span class="nav-badge">Indonesia 🇮🇩</span>
+    </div>
+  </nav>
+
+  <div id="mainContent">
+    <div class="loading"><span class="dots">Memuat</span></div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="/" class="logo">CekDulu<sup>beta</sup></a>
+        <p>Platform perbandingan harga produk marketplace Indonesia. Gratis dan transparan.</p>
+      </div>
+      <div class="footer-links-grid">
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a href="/">Bandingkan harga</a>
+          <a href="/blog.html">Blog</a>
+          <a href="/kategori">Kategori</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="/privacy-policy.html">Kebijakan privasi</a>
+          <a href="/terms.html">Syarat & ketentuan</a>
+          <a href="/disclosure.html">Disclosure afiliasi</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 CekDulu. Dibuat dengan ❤️ untuk konsumen Indonesia.</p>
+      <div class="footer-mkt">
+        <span class="shop-shopee">Shopee</span>
+        <span class="shop-tokopedia">Tokopedia</span>
+        <span class="shop-lazada">Lazada</span>
+        <span class="shop-bukalapak">Bukalapak</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<!-- Cookie Consent -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1a18;color:#fff;padding:14px 24px;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between;box-shadow:0 -4px 20px rgba(0,0,0,.2)">
+  <p style="margin:0;font-size:13px;font-weight:500;flex:1;min-width:200px;line-height:1.5">🍪 CekDulu pakai cookies untuk analytics dan pengalaman yang lebih baik. <a href="/privacy-policy.html" style="color:#E8460A;text-decoration:underline">Kebijakan Privasi</a></p>
+  <div style="display:flex;gap:8px;flex-shrink:0">
+    <button onclick="declineCookies()" style="background:transparent;border:1.5px solid rgba(255,255,255,.3);color:#fff;border-radius:50px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">Tolak</button>
+    <button onclick="acceptCookies()" style="background:#E8460A;border:none;color:#fff;border-radius:50px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">Terima</button>
+  </div>
+</div>
+
+<script>
+  function acceptCookies(){localStorage.setItem('cd_consent','granted');gtag('consent','update',{analytics_storage:'granted'});document.getElementById('cookieBanner').style.display='none'}
+  function declineCookies(){localStorage.setItem('cd_consent','denied');document.getElementById('cookieBanner').style.display='none'}
+  if(!localStorage.getItem('cd_consent')) document.getElementById('cookieBanner').style.display='flex';
+
+  // ── Routing: /kategori vs /kategori/:slug ──
+  const pathParts = window.location.pathname.replace(/\/$/,'').split('/').filter(Boolean);
+  const catSlug   = pathParts[1] || null; // null = listing semua kategori
+
+  const COLOR_MAP = { blue:'icon-blue', green:'icon-green', orange:'icon-orange', red:'icon-red', purple:'icon-purple', yellow:'icon-yellow' };
+
+  function formatPrice(n) {
+    if (!n || n === 0) return null;
+    return 'Rp ' + parseInt(n).toLocaleString('id-ID');
+  }
+
+  // ── RENDER: semua kategori ──
+  function renderAllCategories(categories) {
+    document.getElementById('pageTitle').textContent = 'Semua Kategori Produk – CekDulu';
+    document.getElementById('pageDesc').setAttribute('content', 'Bandingkan harga produk dari semua kategori di marketplace Indonesia. Pilih kategori dan temukan harga terbaik.');
+    document.getElementById('canonicalTag').href = (window.SITE_URL||'') + '/kategori';
+
+    document.getElementById('mainContent').innerHTML = `
+      <div class="page-hero">
+        <p class="eyebrow">Semua Kategori</p>
+        <h1>Cek Harga per <em>Kategori Produk</em></h1>
+        <p>Pilih kategori, lihat produk yang paling sering dicari, dan bandingkan harganya dari semua marketplace sekaligus.</p>
+      </div>
+
+      <div class="cat-grid">
+        ${categories.map(cat => `
+          <a class="cat-card" href="/kategori/${cat.slug}">
+            <div class="cat-icon ${COLOR_MAP[cat.color]||'icon-blue'}">${cat.thumb}</div>
+            <div class="cat-info">
+              <div class="cat-name">${cat.name}</div>
+              <div class="cat-desc">${cat.desc}</div>
+              <div class="cat-count">${cat.count > 0 ? cat.count + ' produk tercatat' : 'Belum ada data — cari duluan!'}</div>
+            </div>
+          </a>
+        `).join('')}
+      </div>
+
+      <div class="cta-banner">
+        <div class="cta-left">
+          <h3>Nggak nemu kategorinya?</h3>
+          <p>Langsung cari nama produknya di homepage. Kami compare harga dari Tokopedia, Shopee, Lazada, dan Bukalapak sekaligus.</p>
+        </div>
+        <a href="/" class="cta-btn">Cari Produk →</a>
+      </div>
+    `;
+  }
+
+  // ── RENDER: satu kategori + produknya ──
+  function renderCategory(cat, products) {
+    document.getElementById('pageTitle').textContent = `${cat.name} – Bandingkan Harga | CekDulu`;
+    document.getElementById('pageDesc').setAttribute('content', `${cat.desc} Bandingkan harga dari Tokopedia, Shopee, Lazada, dan Bukalapak.`);
+    document.getElementById('canonicalTag').href = (window.SITE_URL||'') + '/kategori/' + cat.slug;
+
+    const otherCats = (window._allCats||[]).filter(c => c.slug !== cat.slug);
+
+    const prodHTML = products.length === 0
+      ? `<div class="empty-state">
+           <div class="emoji">🔍</div>
+           <h3>Belum ada produk di kategori ini</h3>
+           <p>Produk otomatis masuk ke sini setelah kamu atau orang lain mencarinya di CekDulu. Coba cari dulu!</p>
+           <div class="empty-search">
+             <input type="text" id="emptySearch" placeholder="Cari ${cat.name.toLowerCase()}..." />
+             <button onclick="goSearch()">Cek Harga</button>
+           </div>
+         </div>`
+      : `<div class="product-grid">
+           ${products.map(p => {
+             const minFmt = formatPrice(p.last_min_price);
+             return `
+             <a class="prod-card" href="/produk/${p.slug}">
+               <div class="prod-thumb">
+                 ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.parentElement.textContent='${cat.thumb}'" />` : cat.thumb}
+               </div>
+               <div class="prod-body">
+                 <div class="prod-name">${p.name}</div>
+                 ${minFmt ? `<div class="prod-price">mulai ${minFmt}</div>` : ''}
+                 <div class="prod-meta">
+                   <span>🔄 ${timeAgo(p.updated_at)}</span>
+                   <span class="prod-search-count">🔍 ${p.search_count}x</span>
+                 </div>
+               </div>
+             </a>`;
+           }).join('')}
+         </div>`;
+
+    document.getElementById('mainContent').innerHTML = `
+      <div class="breadcrumb">
+        <a href="/">Beranda</a><span>/</span>
+        <a href="/kategori">Kategori</a><span>/</span>
+        <span>${cat.name}</span>
+      </div>
+
+      <div class="cat-header">
+        <div class="cat-header-icon ${COLOR_MAP[cat.color]||'icon-blue'}">${cat.thumb}</div>
+        <div>
+          <h1>${cat.name}</h1>
+          <p>${cat.desc}${products.length > 0 ? ` <strong>${products.length} produk</strong> tercatat dari pencarian pengguna.` : ''}</p>
+        </div>
+      </div>
+
+      ${prodHTML}
+
+      ${otherCats.length ? `
+        <p class="section-label">Kategori lainnya</p>
+        <div class="other-cats">
+          ${otherCats.map(c=>`<a class="other-cat-pill" href="/kategori/${c.slug}">${c.thumb} ${c.name}</a>`).join('')}
+        </div>
+      ` : ''}
+
+      <div class="cta-banner">
+        <div class="cta-left">
+          <h3>Cari produk ${cat.name.toLowerCase()} tertentu?</h3>
+          <p>Ketik nama produknya, kami cari harga terbaiknya di semua marketplace sekarang.</p>
+        </div>
+        <a href="/?q=${encodeURIComponent(cat.name)}" class="cta-btn">Cek Harga Sekarang →</a>
+      </div>
+    `;
+  }
+
+  function timeAgo(dateStr) {
+    if (!dateStr) return 'baru';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const m = Math.floor(diff/60000), h = Math.floor(diff/3600000), d = Math.floor(diff/86400000);
+    if (m < 60) return m + ' mnt lalu';
+    if (h < 24) return h + ' jam lalu';
+    return d + ' hari lalu';
+  }
+
+  function goSearch() {
+    const q = (document.getElementById('emptySearch')||{}).value?.trim();
+    if (q) window.location.href = '/?q=' + encodeURIComponent(q);
+  }
+
+  // ── Main load logic ──
+  async function init() {
+    try {
+      if (!catSlug) {
+        // Listing semua kategori
+        const res  = await fetch('/api/kategori');
+        const data = await res.json();
+        window._allCats = data.categories;
+        renderAllCategories(data.categories);
+      } else {
+        // Muat kategori spesifik + semua kategori (untuk "kategori lainnya")
+        const [catRes, allRes] = await Promise.all([
+          fetch(`/api/kategori/${catSlug}`),
+          fetch('/api/kategori'),
+        ]);
+        if (!catRes.ok) { renderNotFound(); return; }
+        const catData = await catRes.json();
+        const allData = await allRes.json();
+        window._allCats = allData.categories;
+        renderCategory(catData.category, catData.products);
+      }
+    } catch(err) {
+      document.getElementById('mainContent').innerHTML = `<div class="empty-state"><div class="emoji">⚠️</div><h3>Gagal memuat data</h3><p>Coba refresh halaman ini.</p></div>`;
+    }
+  }
+
+  function renderNotFound() {
+    document.getElementById('mainContent').innerHTML = `<div class="empty-state"><div class="emoji">🤷</div><h3>Kategori tidak ditemukan</h3><p>Coba cek <a href="/kategori">semua kategori</a> yang tersedia.</p></div>`;
+  }
+
+  init();
+</script>
+</body>
+</html>
